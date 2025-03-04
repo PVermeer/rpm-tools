@@ -1,0 +1,98 @@
+#!/bin/bash
+
+source ./scripts/bash-color.sh
+source ./scripts/utils.sh
+source ./scripts/options.sh
+source ./scripts/build.sh
+source ./scripts/rpm-spec.sh
+source ./scripts/submodules.sh
+source ./scripts/copr.sh
+
+set -e
+set -o pipefail
+
+script_name=$(basename "$0")
+export RPM_LOCAL_BUILD="false"
+export RPM_COPR_BUILD="false"
+export RPM_SPEC_UPDATE="false"
+
+# Script options
+echo_color "\n=== Setting up options ==="
+
+set_environment $@
+set_arguments $@
+print_options
+
+# Required options
+if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ]; then
+  fail_arg "Please provide a 'build / status /update' option"
+fi
+if [ -z $spec_file ]; then
+  fail_arg "No spec-file provided"
+fi
+
+# === BUILD RPM ===
+if [ $build = "true" ]; then
+  echo_color "\n=== RPM build ==="
+
+  build_rpm
+fi
+
+# === UPDATE RPM ===
+if [ $update = "true" ]; then
+  echo_color "\n=== Update RPM ===\n"
+
+  update_spec_repos $spec_file
+
+  if [ "$RPM_SPEC_UPDATE" = "true" ]; then
+    echo_color "\nNew spec file:"
+    # cat $spec_file
+  fi
+
+  if [ $update_submodules = "true" ]; then
+    echo_color "\nUpdating submodules"
+    update_submodules
+  fi
+
+  if [ $apply_patches = "true" ]; then
+    echo_color "\nApplying patches"
+    apply_patches
+  fi
+
+fi
+
+# === COPR ===
+if [ $copr_build = "true" ]; then
+
+  echo_color "\n=== COPR build ===\n"
+
+  build_on_copr
+  echo_color "Build triggered on COPR"
+
+  if [ $copr_watch = "true" ]; then
+
+    if [ -z $copr_owner ] || [ -z $copr_project ] || [ -z $copr_package ]; then
+      fail_arg "Please provide all copr information for --copr-watch"
+    fi
+
+    copr_watch
+  fi
+fi
+
+if [ $copr_status = "true" ]; then
+
+  echo_color "\n=== COPR status ===\n"
+
+  echo_color "Getting status"
+  build_state=$(get_copr_status)
+
+  echo "Copr build status: $build_state"
+
+  if [ "$build_state" = "failed" ]; then
+    exit 1
+  else
+    exit 0
+  fi
+fi
+
+echo ""
