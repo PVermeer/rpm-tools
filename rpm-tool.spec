@@ -4,8 +4,8 @@
 %global repository https://github.com/pvermeer/copr_realtek-alc887-vd
 %global commit 7615a58dfa1c7239f02aafa163573ff884576e3b
 %global repository2 https://github.com/pvermeer/rpm-tools
-%global branch2 test_branch_update
-%global commit2 d9364a32c0e8313ed5f9be152fa770fd37f889a6
+%global branch2 copr_test_source
+%global commit2 4c729811648c20423062af4160a2490557a16519
 
 # Own repo to get patches / sources
 %define ownrepo https://github.com/pvermeer/rpm-tools

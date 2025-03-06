@@ -37,7 +37,6 @@ add_submodule() {
   echo -en "\nAdding new submodule: "
   echo_color -e "$repo"
   git submodule add $repo
-  git submodule update --init --recursive
 }
 
 update_submodules() {
