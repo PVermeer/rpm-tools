@@ -102,11 +102,10 @@ trap "redirect;" DEBUG
 PROMPT_COMMAND='undirect;'
 export BASH_XTRACEFD=1 # set -x to stdout
 
-
 # Trace color `set -x`
 exec 7> >(
   while IFS='' read -r line || [ -n "$line" ]; do
-    echo -e "${tracecolor}${line}${removecolor}"
+    echo -e "\t${tracecolor}${line}${removecolor}"
   done
 )
 
@@ -135,11 +134,17 @@ echo_success() {
   echo -e $switches "${successcolor}✓ $arguments${removecolor}"
 }
 
-# Trace colors for set -x
 echo_debug() {
+  local arguments=$@
+  parse_arguments $arguments
+  echo -e $switches "${tracecolor}✓ $arguments${removecolor}"
+}
+
+# Trace colors for set -x
+run_debug() {
   local BASH_XTRACEFD=7
-  command="${@@Q}"
-  eval $command
+  local command="${@@Q}"
+  eval $command >&7
 }
 
 on_exit() {

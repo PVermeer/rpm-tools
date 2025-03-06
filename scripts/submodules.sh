@@ -95,8 +95,6 @@ update_submodules() {
     echo ""
     cd ..
   done
-
-  git submodule update --init --recursive
 }
 
 apply_patches() {
@@ -110,14 +108,15 @@ apply_patches() {
 
   local path
   for path in $submodule_paths; do
-
+    local patch_files="../patches/$path/*.patch"
+    
     cd "./$path"
 
     # One-by-one so the filename of the patch is printed
     set +e
-    local file
 
-    if [ -f "../patches/$path/*.patch" ]; then
+    if ls $patch_files 1> /dev/null 2>&1; then
+      local file
       for file in ../patches/$path/*.patch; do
         echo_color "\nPatching <$file>:"
         git apply -v $file

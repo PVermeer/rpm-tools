@@ -46,7 +46,7 @@ if [ $update = "true" ]; then
 
   if [ "$RPM_SPEC_UPDATE" = "true" ]; then
     echo_color "\nNew spec file:"
-    # cat $spec_file
+    cat $spec_file
   fi
 
   if [ $update_submodules = "true" ]; then

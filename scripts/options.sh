@@ -1,8 +1,6 @@
 #!/bin/bash
 
 spec_file=""
-source_dir=""
-patch_dir=""
 copr_webhook=""
 build="false"
 update="false"
@@ -21,8 +19,6 @@ usage() {
     [ --spec-file SPEC-FILE ] Spec-file path
 
       [ build ] Build locally
-        [ --sources PATH ] Path to source dir
-        [ --patches PATH ] Path to patch dir
 
       [ copr-build ] Trigger a build on COPR
         [ --copr-webhook URL ] COPR webhook url
@@ -45,17 +41,12 @@ usage() {
           [ %global branch<number> ] <optional=HEAD> The branch to check the latest commit on
           Match by incrementing the <number> values
 
-  RPM-spec file:
-    Use '%define sourcedir %{_topdir}/SOURCES' to reference the provide sources and patches in your spec file.
-
   Environment (can also be set in './.env'):
       SPEC_FILE=
       COPR_OWNER=
       COPR_PROJECT=
       COPR_PACKAGE=
       COPR_WEBHOOK=
-      RPM_SOURCE_DIR=
-      RPM_PATCH_DIR=
 
   Exported variables:
     RPM_LOCAL_BUILD=\"false\" || \"true\"
@@ -85,11 +76,6 @@ print_options() {
   echo_color -n "\tCOPR_WEBHOOK:"
   if [ -n "$copr_webhook" ]; then echo " ***"; else echo ""; fi
 
-  echo_color -n "\tRPM_SOURCE_DIR:"
-  echo " $source_dir"
-  echo_color -n "\tRPM_PATCH_DIR:"
-  echo " $patch_dir"
-
   echo ""
 }
 
@@ -100,8 +86,6 @@ set_environment() {
   copr_project=$COPR_PROJECT
   copr_package=$COPR_PACKAGE
   copr_webhook=$COPR_WEBHOOK
-  source_dir=$RPM_SOURCE_DIR
-  patch_dir=$RPM_PATCH_DIR
 
   if [ -f "./.env" ]; then
     echo -e "\nFound environment file"
@@ -113,12 +97,10 @@ set_environment() {
   if [ -z "$copr_project" ]; then copr_project=$COPR_PROJECT; fi
   if [ -z "$copr_package" ]; then copr_package=$COPR_PACKAGE; fi
   if [ -z "$copr_webhook" ]; then copr_webhook=$COPR_WEBHOOK; fi
-  if [ -z "$source_dir" ]; then source_dir=$RPM_SOURCE_DIR; fi
-  if [ -z "$patch_dir" ]; then patch_dir=$RPM_PATCH_DIR; fi
 }
 
 set_arguments() {
-  local long_arguments="help,spec-file:,sources:,patches:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,build,update,copr-build,copr-status"
+  local long_arguments="help,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,build,update,copr-build,copr-status"
   local short_arguments=""
 
   local parsed_arguments=$(getopt --options=$short_arguments --longoptions=$long_arguments --name "$0" -- "$@") || exit 1
@@ -132,14 +114,6 @@ set_arguments() {
       ;;
     --spec-file)
       spec_file="$2"
-      shift 2
-      ;;
-    --sources)
-      source_dir="$2"
-      shift 2
-      ;;
-    --patches)
-      patch_dir="$2"
       shift 2
       ;;
     --copr-webhook)
