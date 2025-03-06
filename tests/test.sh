@@ -109,8 +109,8 @@ update_submodules() {
 
 # Run tests
 remove_submodules
-build_local
 update_submodules
+build_local
 if [ $enable_copr_build = "true" ]; then build_copr; fi
 copr_status
 

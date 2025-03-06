@@ -36,7 +36,7 @@ add_submodule() {
 
   echo -en "\nAdding new submodule: "
   echo_color -e "$repo"
-  git submodule add $repo || return 1
+  git submodule add $repo
   git submodule update --init --recursive
 }
 
@@ -58,7 +58,7 @@ update_submodules() {
 
     # Add repo if not in .gitmodules
     if [ ! -f ./.gitmodules ]; then
-      add_submodule $repo || continue
+      add_submodule $repo
     fi
 
     local submodule_path
