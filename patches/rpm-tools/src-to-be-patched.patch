@@ -1,0 +1,11 @@
+diff --git a/src/src-to-be-patched.sh b/src/src-to-be-patched.sh
+index 33da202..7d8ecd5 100644
+--- a/src/src-to-be-patched.sh
++++ b/src/src-to-be-patched.sh
+@@ -1,5 +1,5 @@
+ #!/bin/bash
+ 
+-echo "This is not patched"
++echo "This is patched!"
+ 
+ exit
