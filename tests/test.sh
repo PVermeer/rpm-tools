@@ -47,8 +47,10 @@ test_command() {
     $command &>/dev/null
   fi
 
-  if [ $? -ne 0 ] && [ "$explicit_verbose" = "false" ]; then
-    failed_commands+=("$command")
+  if [ $? -ne 0 ]; then
+    if [ "$explicit_verbose" = "false" ]; then
+      failed_commands+=("$command")
+    fi
     echo_error -n "Failed"
     echo " $command"
   else
@@ -66,6 +68,23 @@ run_failed_commands() {
   done
 }
 
+remove_submodules() {
+  echo_color "Remove submodules"
+
+  remove() {
+    local submodule_dir="$1"
+    if [ -d $submodule_dir ]; then
+      git submodule deinit -f $submodule_dir
+      git rm -f $submodule_dir
+      rm -rf .git/modules/$submodule_dir
+    fi
+  }
+
+  test_command remove "./copr_realtek-alc887-vd"
+  test_command remove "./rpm-tools"
+}
+
+# Tests
 build_local() {
   echo_color "Build RPM locally"
   test_command ./rpm-tool build
@@ -89,6 +108,7 @@ update_submodules() {
 }
 
 # Run tests
+remove_submodules
 build_local
 update_submodules
 if [ $enable_copr_build = "true" ]; then build_copr; fi
