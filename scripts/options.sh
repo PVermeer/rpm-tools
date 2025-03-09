@@ -1,6 +1,7 @@
 #!/bin/bash
 
 spec_file=""
+disable_self_update="false"
 copr_webhook=""
 build="false"
 update="false"
@@ -17,6 +18,7 @@ usage() {
   echo -e "$script_name usage:
 
     [ --spec-file SPEC-FILE ] Spec-file path
+    [ --disable-self-update ] Disable self updating of this application 
 
       [ build ] Build locally
 
@@ -42,6 +44,7 @@ usage() {
           Match by incrementing the <number> values
 
   Environment (can also be set in './.env'):
+      DISABLE_SELF_UPDATE=
       SPEC_FILE=
       COPR_OWNER=
       COPR_PROJECT=
@@ -64,6 +67,9 @@ fail_arg() {
 print_options() {
   echo_color -e "\nUsing options:"
 
+  echo_color -n "\tDISABLE_SELF_UPDATE:"
+  echo " $disable_self_update"
+
   echo_color -n "\tSPEC_FILE:"
   echo " $spec_file"
 
@@ -80,27 +86,42 @@ print_options() {
 }
 
 set_environment() {
+  # Save global options set by user
+  local env_disable_self_update=$DISABLE_SELF_UPDATE
+  local env_spec_file=$SPEC_FILE
+  local env_copr_owner=$COPR_OWNER
+  local env_copr_project=$COPR_PROJECT
+  local env_copr_package=$COPR_PACKAGE
+  local env_copr_webhook=$COPR_WEBHOOK
 
-  spec_file=$SPEC_FILE
-  copr_owner=$COPR_OWNER
-  copr_project=$COPR_PROJECT
-  copr_package=$COPR_PACKAGE
-  copr_webhook=$COPR_WEBHOOK
-
+  # Override global options with .env file
   if [ -f "./.env" ]; then
     echo -e "\nFound environment file"
     source "./.env"
   fi
+  
+  # Set options from .env file (prio 3)
+  if [ -n "$DISABLE_SELF_UPDATE" ]; then disable_self_update=$DISABLE_SELF_UPDATE; fi
+  if [ -n "$SPEC_FILE" ]; then spec_file=$SPEC_FILE; fi
+  if [ -n "$COPR_OWNER" ]; then copr_owner=$COPR_OWNER; fi
+  if [ -n "$COPR_PROJECT" ]; then copr_project=$COPR_PROJECT; fi
+  if [ -n "$COPR_PACKAGE" ]; then copr_package=$COPR_PACKAGE; fi
+  if [ -n "$COPR_WEBHOOK" ]; then copr_webhook=$COPR_WEBHOOK; fi
 
-  if [ -z "$spec_file" ]; then spec_file=$SPEC_FILE; fi
-  if [ -z "$copr_owner" ]; then copr_owner=$COPR_OWNER; fi
-  if [ -z "$copr_project" ]; then copr_project=$COPR_PROJECT; fi
-  if [ -z "$copr_package" ]; then copr_package=$COPR_PACKAGE; fi
-  if [ -z "$copr_webhook" ]; then copr_webhook=$COPR_WEBHOOK; fi
+  
+  # Set global options set by user (prio 2)
+  if [ -n "$env_disable_self_update" ]; then disable_self_update=$env_disable_self_update; fi
+  if [ -n "$env_spec_file" ]; then spec_file=$env_spec_file; fi
+  if [ -n "$env_copr_owner" ]; then copr_owner=$env_copr_owner; fi
+  if [ -n "$env_copr_project" ]; then copr_project=$env_copr_project; fi
+  if [ -n "$env_copr_package" ]; then copr_package=$env_copr_package; fi
+  if [ -n "$env_copr_webhook" ]; then copr_webhook=$env_copr_webhook; fi
+
+  # Prio 1 are the passed arguments
 }
 
 set_arguments() {
-  local long_arguments="help,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,build,update,copr-build,copr-status"
+  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,build,update,copr-build,copr-status"
   local short_arguments=""
 
   local parsed_arguments=$(getopt --options=$short_arguments --longoptions=$long_arguments --name "$0" -- "$@") || exit 1
@@ -111,6 +132,10 @@ set_arguments() {
     --help)
       usage
       exit 0
+      ;;
+    --disable-self-update)
+      disable_self_update="true"
+      shift
       ;;
     --spec-file)
       spec_file="$2"

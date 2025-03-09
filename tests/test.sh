@@ -37,9 +37,14 @@ set_arguments $@
 
 failed_commands=()
 explicit_verbose="false"
+enable_self_update="false"
 
 test_command() {
   local command="$@"
+
+  if [ "$enable_self_update" = "false" ]; then
+    command+=" --disable-self-update"
+  fi
 
   if [ "$verbose" = "true" ] || [ "$explicit_verbose" = "true" ]; then
     run_debug $command
@@ -107,7 +112,15 @@ update_submodules() {
   test_command ./rpm-tool update --update-submodules --apply-patches
 }
 
+update_self() {
+  echo_color "Test self updater"
+  enable_self_update="true"
+  test_command ./rpm-tool build
+  enable_self_update="false"
+}
+
 # Run tests
+update_self
 remove_submodules
 update_submodules
 build_local

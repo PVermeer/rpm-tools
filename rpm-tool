@@ -7,6 +7,7 @@ source ./scripts/build.sh
 source ./scripts/rpm-spec.sh
 source ./scripts/submodules.sh
 source ./scripts/copr.sh
+source ./scripts/updater.sh
 
 set -e
 set -o pipefail
@@ -22,6 +23,16 @@ echo_color "\n=== Setting up options ==="
 set_environment $@
 set_arguments $@
 print_options
+
+# Update self
+echo_color "\n=== Checking for updates ==="
+if [ "$disable_self_update" = "false" ]; then
+  update_self
+  exec ./rpm-tool $@ --disable-self-update
+  exit 0
+else
+  echo "Updates are disabled"
+fi
 
 # Required options
 if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ]; then

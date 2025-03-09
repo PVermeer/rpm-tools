@@ -5,7 +5,7 @@ get_submodule_path_from_url() {
   local config_path
   local path
 
-  config_path=$(git config --file .gitmodules --get-regexp url | grep "$url" | awk '{ print $1 }' | awk -F "." '{ print $1"."$2 }' | head -n 1)
+  config_path=$(git config --file .gitmodules --get-regexp url | grep -w "$url" | awk '{ print $1 }' | awk -F "." '{ print $1"."$2 }' | head -n 1)
 
   if [ -z "$config_path" ]; then return 1; fi
 
