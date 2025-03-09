@@ -6,7 +6,9 @@ update_self() {
     return
   fi
 
-  rpm_tools_submodule=$(get_submodule_path_from_url "https://github.com/pvermeer/rpm-tools") || true
+  local git_repo="https://github.com/PVermeer/rpm-tools"
+
+  local rpm_tools_submodule=$(get_submodule_path_from_url "$git_repo") || $(get_submodule_path_from_url "$git_repo.git") || true
 
   if [ -z "$rpm_tools_submodule" ]; then
     echo "Not installed as submodule, not able to self update"
