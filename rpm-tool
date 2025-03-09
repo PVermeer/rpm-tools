@@ -1,18 +1,20 @@
 #!/bin/bash
 
-source ./scripts/bash-color.sh
-source ./scripts/utils.sh
-source ./scripts/options.sh
-source ./scripts/build.sh
-source ./scripts/rpm-spec.sh
-source ./scripts/submodules.sh
-source ./scripts/copr.sh
-source ./scripts/updater.sh
-
 set -e
 set -o pipefail
 
 script_name=$(basename "$0")
+script_dir=$(dirname "$0")
+
+source $script_dir/scripts/bash-color.sh
+source $script_dir/scripts/utils.sh
+source $script_dir/scripts/options.sh
+source $script_dir/scripts/build.sh
+source $script_dir/scripts/rpm-spec.sh
+source $script_dir/scripts/submodules.sh
+source $script_dir/scripts/copr.sh
+source $script_dir/scripts/updater.sh
+
 export RPM_LOCAL_BUILD="false"
 export RPM_COPR_BUILD="false"
 export RPM_SPEC_UPDATE="false"
