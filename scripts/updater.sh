@@ -14,7 +14,7 @@ update_self() {
   fi
 
   if [ -n "$rpm_tools_submodule" ]; then
-    if git submodule update --init -f $rpm_tools_submodule; then
+    if git submodule update --init --remote -f $rpm_tools_submodule; then
       echo "Updated myself to latest git"
     else
       echo_warning "Could not update myself"
