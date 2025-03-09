@@ -29,9 +29,10 @@ print_options
 # Update self
 echo_color "\n=== Checking for updates ==="
 if [ "$disable_self_update" = "false" ]; then
-  update_self
-  exec ./rpm-tool $@ --disable-self-update
-  exit 0
+  if update_self; then
+    exec $script_dir/rpm-tool $@ --disable-self-update
+    exit 0
+  fi
 else
   echo "Updates are disabled"
 fi
