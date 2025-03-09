@@ -150,5 +150,4 @@ run_debug() {
 on_exit() {
   unset BASH_XTRACEFD
 }
-trap on_exit ERR
 trap on_exit EXIT
