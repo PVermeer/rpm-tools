@@ -1,9 +1,5 @@
 #!/bin/bash
 
-source ./scripts/bash-color.sh
-source ./scripts/submodules.sh
-
-
 update_self() {
   if ! which git >/dev/null; then
     echo_warning "Git not installed, not able to self update"
@@ -18,7 +14,7 @@ update_self() {
   fi
 
   if [ -n "$rpm_tools_submodule" ]; then
-    if git submodule update --init --recursive -f $rpm_tools_submodule; then
+    if git submodule update --init -f $rpm_tools_submodule; then
       echo "Updated myself to latest git"
     else
       echo_warning "Could not update myself"
