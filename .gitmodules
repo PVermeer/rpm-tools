@@ -1,0 +1,3 @@
+[submodule "copr_realtek-alc887-vd"]
+	path = copr_realtek-alc887-vd
+	url = https://github.com/PVermeer/copr_realtek-alc887-vd
