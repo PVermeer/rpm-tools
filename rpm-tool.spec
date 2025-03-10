@@ -14,7 +14,7 @@
 %global source2 rpm-tools_copr_test_source
 %global sourcerepo2 https://github.com/pvermeer/rpm-tools
 %global branch2 copr_test_source
-%global commit2 4c729811648c20423062af4160a2490557a16519
+%global commit2 1ae517dbc21cde7965d60e285054de28aa2194b1
 %global versioncommit2 %(echo -n %{commit2} | head -c 8)
 
 # Own copr repo

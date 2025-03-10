@@ -91,8 +91,10 @@ update_submodules() {
       git switch $branch
     fi
     git reset --hard $commit
-    echo ""
+    git submodule update --init --recursive --checkout --force
     cd ..
+
+    echo ""
   done
 }
 
@@ -108,13 +110,13 @@ apply_patches() {
   local path
   for path in $submodule_paths; do
     local patch_files="../patches/$path/*.patch"
-    
+
     cd "./$path"
 
     # One-by-one so the filename of the patch is printed
     set +e
 
-    if ls $patch_files 1> /dev/null 2>&1; then
+    if ls $patch_files 1>/dev/null 2>&1; then
       local file
       for file in ../patches/$path/*.patch; do
         echo_color "\nPatching <$file>:"
