@@ -5,6 +5,7 @@ disable_self_update="false"
 copr_webhook=""
 build="false"
 update="false"
+update_self="false"
 copr_build="false"
 copr_watch="false"
 copr_status="false"
@@ -13,12 +14,13 @@ copr_project=""
 copr_package=""
 update_submodules="false"
 apply_patches="false"
+without_local="false"
 
 usage() {
   echo -e "$script_name usage:
 
     [ --spec-file SPEC-FILE ] Spec-file path
-    [ --disable-self-update ] Disable self updating of this application 
+    [ --disable-self-update ] Disable self updating of this application
 
       [ build ] Build locally
 
@@ -43,6 +45,8 @@ usage() {
           [ %global branch<number> ] <optional=HEAD> The branch to check the latest commit on
           Match by incrementing the <number> values
 
+      [ update-self ] Update this application as submodule
+
   Environment (can also be set in './.env'):
       DISABLE_SELF_UPDATE=
       SPEC_FILE=
@@ -54,7 +58,9 @@ usage() {
   Exported variables:
     RPM_LOCAL_BUILD=\"false\" || \"true\"
     RPM_COPR_BUILD=\"false\" || \"true\"
-    RPM_SPEC_UPDATE=\"false\" || \"true\""
+    RPM_SPEC_UPDATE=\"false\" || \"true\"
+    SELF_UPDATE=\"false\" || \"true\"
+"
 }
 
 fail_arg() {
@@ -99,7 +105,7 @@ set_environment() {
     echo -e "\nFound environment file"
     source "./.env"
   fi
-  
+
   # Set options from .env file (prio 3)
   if [ -n "$DISABLE_SELF_UPDATE" ]; then disable_self_update=$DISABLE_SELF_UPDATE; fi
   if [ -n "$SPEC_FILE" ]; then spec_file=$SPEC_FILE; fi
@@ -108,7 +114,6 @@ set_environment() {
   if [ -n "$COPR_PACKAGE" ]; then copr_package=$COPR_PACKAGE; fi
   if [ -n "$COPR_WEBHOOK" ]; then copr_webhook=$COPR_WEBHOOK; fi
 
-  
   # Set global options set by user (prio 2)
   if [ -n "$env_disable_self_update" ]; then disable_self_update=$env_disable_self_update; fi
   if [ -n "$env_spec_file" ]; then spec_file=$env_spec_file; fi
@@ -121,7 +126,7 @@ set_environment() {
 }
 
 set_arguments() {
-  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,build,update,copr-build,copr-status"
+  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,without-local,update-self,build,update,copr-build,copr-status"
   local short_arguments=""
 
   local parsed_arguments=$(getopt --options=$short_arguments --longoptions=$long_arguments --name "$0" -- "$@") || exit 1
@@ -169,6 +174,10 @@ set_arguments() {
       apply_patches="true"
       shift
       ;;
+    --without-local)
+      without_local="true"
+      shift
+      ;;
     build)
       build="true"
       shift
@@ -183,6 +192,10 @@ set_arguments() {
       ;;
     copr-status)
       copr_status="true"
+      shift
+      ;;
+    update-self)
+      update_self="true"
       shift
       ;;
     --)

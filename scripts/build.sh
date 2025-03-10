@@ -10,6 +10,8 @@ build_rpm() {
   # So do not use these and just get sources/patches in %prep
   # so repo organisation will be much better
   cp $spec_file ./rpmbuild/SOURCES/ &>/dev/null || true
+  cp -r ./sources ./rpmbuild/SOURCES/ &>/dev/null || true
+  cp -r ./patches ./rpmbuild/SOURCES/ &>/dev/null || true
 
   if [ "$(ls ./rpmbuild/SOURCES)" ]; then
     find ./rpmbuild/SOURCES -maxdepth 2 -type f
@@ -21,7 +23,13 @@ build_rpm() {
   rpmlint ./$spec_file
 
   echo_color "\nRPM Build"
-  run_debug rpmbuild --define "_topdir $PWD/rpmbuild" -ba --noclean ./$spec_file
+
+  if [ "$without_local" = "true" ]; then
+    # For debugging COPR in local builds
+    run_debug rpmbuild --define "_topdir $PWD/rpmbuild" -ba --noclean ./$spec_file
+  else
+    run_debug rpmbuild --define "_topdir $PWD/rpmbuild" -ba --noclean --with local ./$spec_file
+  fi
 
   echo_color "\n=== RPM Contents ==="
   # One-by-one for some separation

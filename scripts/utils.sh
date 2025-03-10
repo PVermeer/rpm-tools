@@ -1,7 +1,7 @@
 #!/bin/bash
 
 fail() {
-  echo_error "\n$@\n"
+  echo_error "$@\n"
   exit 1
 }
 

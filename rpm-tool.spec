@@ -1,55 +1,60 @@
-# Example SPEC file (that should work)
+# Create an option to build locally without fetchting own repo
+# for sourcing and patching
+%bcond local 0
 
+# Source repo 1
 %global author pvermeer
-%global repository https://github.com/pvermeer/copr_realtek-alc887-vd
+%global source copr_realtek-alc887-vd
+%global sourcerepo https://github.com/pvermeer/copr_realtek-alc887-vd
 %global commit 7615a58dfa1c7239f02aafa163573ff884576e3b
-%global repository2 https://github.com/pvermeer/rpm-tools
+%global versioncommit %(echo -n %{commit} | head -c 8)
+
+# Source repo 2
+%global author2 pvermeer
+%global source2 rpm-tools_copr_test_source
+%global sourcerepo2 https://github.com/pvermeer/rpm-tools
 %global branch2 copr_test_source
 %global commit2 4c729811648c20423062af4160a2490557a16519
+%global versioncommit2 %(echo -n %{commit2} | head -c 8)
 
-# Own repo to get patches / sources
-%define ownrepo https://github.com/pvermeer/rpm-tools
-%define coprrepo git_copr_rpm-tools
-
-%define repo git_copr_realtek-alc887-vd
-%define repo2 git_rpm-tools
-
-%define versioncommit %(echo -n %{commit} | head -c 8)
-%define versioncommit2 %(echo -n %{commit2} | head -c 8)
+# Own copr repo
+%global coprrepo https://github.com/pvermeer/rpm-tools
+%global coprsource rpm-tools
 
 Name: rpm-tool
 Version: 0.0.0
 Release: %{versioncommit}.%{versioncommit2}%{?dist}
 License: GPL-3.0 license
 Summary: RPM build to test the rpm-tools.
-Url: https://github.com/%{author}/%{repository}
+Url: %{coprrepo}
 
 BuildRequires: git
 
 %define workdir %{_builddir}/%{name}
-%define coprdir %{workdir}/%{coprrepo}
-%define sourcedir %{workdir}/%{repo}
-%define sourcedir2 %{workdir}/%{repo2}
+%define coprdir %{workdir}/%{coprsource}
+%define sourcedir %{workdir}/%{source}
+%define sourcedir2 %{workdir}/%{source2}
 
 %description
 RPM build to test the rpm-tools
 
 %prep
-# Get all sources externally.
-# RPM build does not allow subdirs for sources/patches
-# so do it ourself to keep things organised
+# To apply working changes handle sources / patches locally
+# COPR should clone the commited changes
+%if %{with local}
+  # Get sources / patches - local build
+  mkdir -p %{coprdir}
+  cp -r %{_topdir}/SOURCES/* %{coprdir}
+%else
+  # Get sources / patches - COPR build
+  git clone %{coprrepo} %{coprdir}
+  cd %{coprdir}
+  rm -rf .git
+  cd %{workdir}
+%endif
 
-# Copr files repo repo for sources and patches
-git clone %{ownrepo} %{coprdir}
-cd %{coprdir}
-
-# Do src stuff
-
-rm -rf .git
-cd %{workdir}
-
-# === Dependency repo
-git clone %{repository} %{sourcedir}
+# Get source1 repo
+git clone %{sourcerepo} %{sourcedir}
 cd %{sourcedir}
 git reset --hard %{commit}
 
@@ -58,8 +63,8 @@ git reset --hard %{commit}
 rm -rf .git
 cd %{workdir}
 
-# === Dependency repo 2
-git clone %{repository2} %{sourcedir2}
+# Get source2 repo
+git clone %{sourcerepo2} %{sourcedir2}
 cd %{sourcedir2}
 git reset --hard %{commit2}
 

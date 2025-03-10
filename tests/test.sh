@@ -91,8 +91,13 @@ remove_submodules() {
 
 # Tests
 build_local() {
-  echo_color "Build RPM locally"
+  echo_color "Build RPM with local sources / patches"
   test_command ./rpm-tool build
+}
+
+build_without_local() {
+  echo_color "Build RPM locally as it would in COPR"
+  test_command ./rpm-tool build --without-local
 }
 
 build_copr() {
@@ -113,19 +118,35 @@ update_submodules() {
 }
 
 update_self() {
-  echo_color "Test self updater"
+  echo_color "Self update"
   enable_self_update="true"
-  test_command ./rpm-tool build
+  test_command ./rpm-tool update-self
   enable_self_update="false"
 }
 
 # Run tests
 update_self
+echo ""
+
 remove_submodules
+echo ""
+
 update_submodules
+echo ""
+
 build_local
-if [ $enable_copr_build = "true" ]; then build_copr; fi
+echo ""
+
+build_without_local
+echo ""
+
+if [ $enable_copr_build = "true" ]; then
+  build_copr
+  echo ""
+fi
+
 copr_status
+echo ""
 
 if [ ${#failed_commands[@]} -gt 0 ]; then
   echo_color "\nFailures:"

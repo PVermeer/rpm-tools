@@ -52,7 +52,7 @@ update_submodules() {
     key=$(get_key $keyValue)
     value=$(get_value $keyValue)
 
-    if [[ ! $key = repository* ]]; then continue; fi
+    if [[ ! $key = sourcerepo* ]]; then continue; fi
     repo=$value
 
     # Add repo if not in .gitmodules
@@ -65,11 +65,11 @@ update_submodules() {
     local commit
     local branch
 
-    submodule_path=$(get_submodule_path_from_url $repo) || echo ""
+    submodule_path=$(get_submodule_path_from_url $repo || echo "")
 
     if [ -z "$submodule_path" ]; then
-      add_submodule $repo || continue
-      submodule_path=$(get_submodule_path_from_url $repo)
+      add_submodule $repo || true
+      submodule_path=$(get_submodule_path_from_url $repo || echo "")
     fi
 
     if [ -z "$submodule_path" ]; then

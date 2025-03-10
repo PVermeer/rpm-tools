@@ -113,7 +113,7 @@ update_spec_repos() {
     key=$(get_key $keyValue)
     value=$(get_value $keyValue)
 
-    if [[ ! $key = repository* ]]; then continue; fi
+    if [[ ! $key = sourcerepo* ]]; then continue; fi
 
     local repo_key
     local repo_value

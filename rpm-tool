@@ -18,6 +18,7 @@ source $script_dir/scripts/updater.sh
 export RPM_LOCAL_BUILD="false"
 export RPM_COPR_BUILD="false"
 export RPM_SPEC_UPDATE="false"
+export UPDATE_SELF="false"
 
 # Script options
 echo_color "\n=== Setting up options ==="
@@ -26,23 +27,27 @@ set_environment $@
 set_arguments $@
 print_options
 
-# Update self
-echo_color "\n=== Checking for updates ==="
-if [ "$disable_self_update" = "false" ]; then
-  if update_self; then
-    exec $script_dir/rpm-tool $@ --disable-self-update
-    exit 0
-  fi
-else
-  echo "Updates are disabled"
-fi
-
 # Required options
-if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ]; then
-  fail_arg "Please provide a 'build / status /update' option"
+if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ] && [ "$update_self" = "false" ]; then
+  fail_arg "Please provide a 'build / status / update' option"
 fi
 if [ -z $spec_file ]; then
   fail_arg "No spec-file provided"
+fi
+
+# Update self
+echo_color "\n=== Checking for updates ==="
+if [ "$disable_self_update" = "true" ]; then
+  echo "Updates are disabled"
+else
+  if update_self; then
+    UPDATE_SELF="true"
+    if [ "$update_self" = "false" ]; then
+      echo_warning -e "\n========== LOADING UPDATE ==========\n"
+      exec $script_dir/rpm-tool $@ --disable-self-update
+      exit 0
+    fi
+  fi
 fi
 
 # === BUILD RPM ===
