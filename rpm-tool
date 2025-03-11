@@ -24,7 +24,6 @@ export UPDATE_SELF="false"
 # Installing dependencies
 echo_color "\n=== Installing dependencies ==="
 install_dependencies || fail "Could not install dependencies"
-echo_success "All good now"
 
 # Script options
 echo_color "\n=== Setting up options ==="
