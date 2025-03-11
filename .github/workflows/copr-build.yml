@@ -44,7 +44,7 @@ jobs:
       COPR_WEBHOOK: ${{ secrets.COPR_WEBHOOK }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RPM_SPEC_UPDATE: "false"
-      COPR_SUCCEEDED: "true"
+      COPR_STATUS: "null"
 
     steps:
       - name: Container setup
@@ -71,14 +71,16 @@ jobs:
       - name: Update RPM
         run: |
           cd repo
-          source ../rpm-tools/rpm-tool update --update-submodules --disable-self-update
+          ../rpm-tools/rpm-tool update --disable-self-update
+          source $XDG_RUNTIME_DIR/rpm-tool-vars
           echo "RPM_SPEC_UPDATE=$RPM_SPEC_UPDATE" >> $GITHUB_ENV
 
       - name: Check COPR status
         run: |
           cd repo
-          source ../rpm-tools/rpm-tool copr-status --disable-self-update || true
-          echo "COPR_SUCCEEDED=$COPR_SUCCEEDED" >> $GITHUB_ENV
+          ../rpm-tools/rpm-tool copr-status --disable-self-update
+          source $XDG_RUNTIME_DIR/rpm-tool-vars
+          echo "COPR_STATUS=$copr_status" >> $GITHUB_ENV
 
       - name: Commit changes
         if: ${{ env.RPM_SPEC_UPDATE == 'true' }}
@@ -90,7 +92,7 @@ jobs:
           git push
 
       - name: Build on COPR
-        if: ${{ env.RPM_SPEC_UPDATE == 'true' || env.COPR_SUCCEEDED == 'false' }}
+        if: ${{ env.RPM_SPEC_UPDATE == 'true' || env.COPR_STATUS == 'failed' }}
         run: |
           cd repo
           ../rpm-tools/rpm-tool copr-build --disable-self-update

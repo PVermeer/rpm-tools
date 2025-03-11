@@ -19,7 +19,8 @@ export RPM_LOCAL_BUILD="false"
 export RPM_COPR_BUILD="false"
 export RPM_SPEC_UPDATE="false"
 export UPDATE_SELF="false"
-export COPR_SUCCEEDED="false"
+export COPR_STATUS="null"
+trap export_variables_to_tmp EXIT
 
 # Script options
 echo_color "\n=== Setting up options ==="
@@ -110,18 +111,18 @@ fi
 
 # === COPR Status ===
 if [ $copr_status = "true" ]; then
+  echo_color "\n=== COPR status ==="
 
-  echo_color "\n=== COPR status ===\n"
-
-  echo_color "Getting status"
   is_succeeded="false"
   build_state=$(get_copr_status) && is_succeeded="true" || true
+  COPR_STATUS="$build_state"
 
-  echo "Copr build status: $build_state"
-
-  if [ "$is_succeeded" = "false" ]; then
+  echo -n "Copr build status: "
+  if [ "$is_succeeded" = "true" ]; then
+    echo_success "$build_state"
+  else
+    echo_error "$build_state"
     exit 1
   fi
 fi
 
-echo ""

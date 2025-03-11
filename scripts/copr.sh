@@ -25,13 +25,11 @@ get_copr_status() {
   local error="$(echo $response | jq -r '.error')"
 
   if [ "$error" = "null" ]; then
-    echo_success $build_state
-    COPR_SUCCEEDED="true"
+    echo $build_state
     return 0
   fi
 
-  echo_error $error
-  COPR_SUCCEEDED="false"
+  echo $error
   return 1
 }
 
@@ -44,8 +42,10 @@ copr_watch() {
     on_error() {
       echo_error "$build_state"
       build_state="null"
+      COPR_STATUS="$build_state"
     }
     build_state=$(get_copr_status) || on_error
+    COPR_STATUS="$build_state"
 
     if [ "$build_state" = "succeeded" ]; then
       echo "Copr build status: $(echo_success $build_state) $(date)"

@@ -5,6 +5,24 @@ fail() {
   exit 1
 }
 
+export_variables_to_tmp() {
+  local status_file="$XDG_RUNTIME_DIR/rpm-tool-vars"
+  touch $status_file
+
+  local status_vars="\n
+  RPM_LOCAL_BUILD="$RPM_LOCAL_BUILD"\n
+  RPM_COPR_BUILD="$RPM_COPR_BUILD"\n
+  RPM_SPEC_UPDATE="$RPM_SPEC_UPDATE"\n
+  UPDATE_SELF="$UPDATE_SELF"\n
+  COPR_STATUS="$COPR_STATUS"
+  "
+  echo -e $status_vars > $status_file
+
+  echo_color -e "\nStatus file <$status_file>:"
+  cat $status_file
+  echo ""
+}
+
 install_dependencies() {
   if [ ! -f "/usr/bin/which" ]; then
     echo -n "Installing: "

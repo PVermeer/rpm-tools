@@ -58,12 +58,12 @@ usage() {
       COPR_PACKAGE=
       COPR_WEBHOOK=
 
-  Exported variables:
+  Exported variables $XDG_RUNTIME_DIR/rpm-tool-vars:
     RPM_LOCAL_BUILD=\"false\" || \"true\"
     RPM_COPR_BUILD=\"false\" || \"true\"
     RPM_SPEC_UPDATE=\"false\" || \"true\"
     SELF_UPDATE=\"false\" || \"true\"
-    COPR_SUCCEEDED=\"false\" || \"true\"
+    COPR_STATUS=\"status on copr\" || \"null\"
 "
 }
 
