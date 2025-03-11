@@ -1,7 +1,7 @@
 #!/bin/bash
 
 update_self() {
-  if ! which git >/dev/null; then
+  if ! which git &>/dev/null; then
     echo_warning "Git not installed, not able to self update"
     return 1
   fi

@@ -6,6 +6,12 @@ fail() {
 }
 
 install_dependencies() {
+  if [ ! -f "/usr/bin/which" ]; then
+    echo -n "Installing: "
+    echo_color "which"
+    run_debug sudo dnf install -y --quiet which 2>/dev/null || return 1
+  fi
+
   local missing_deps=""
   if ! which getopt &>/dev/null; then missing_deps+=" util-linux"; fi
   if ! which git &>/dev/null; then missing_deps+=" git"; fi
@@ -15,7 +21,7 @@ install_dependencies() {
     echo -n "Installing packages: "
     echo_color "$missing_deps:"
     echo ""
-    run_debug sudo dnf install -y --quiet $missing_deps || return 1
+    run_debug sudo dnf install -y --quiet $missing_deps 2>/dev/null || return 1
   else
     echo "No missing packages"
   fi
