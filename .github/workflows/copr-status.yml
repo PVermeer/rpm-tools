@@ -8,7 +8,7 @@ on:
         required: true
         type: string
 
-      copr_owner: 
+      copr_owner:
         description: COPR owner
         required: true
         type: string
@@ -39,10 +39,23 @@ jobs:
       - name: Container setup
         run: dnf install -y git
 
-      - uses: actions/checkout@v4
+      - name: Checkout rpm-tools
+        uses: actions/checkout@v4
+        with:
+          repository: pvermeer/rpm-tools
+          path: rpm-tools
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
 
       - name: Install dependencies
-        run: ./rpm-tool install-deps --disable-self-update
+        run: |
+          cd repo
+          ../rpm-tools/rpm-tool install-deps --disable-self-update
 
       - name: Check COPR status
-        run: ./rpm-tool copr-status --disable-self-update
+        run: |
+          cd repo
+          ../rpm-tools/rpm-tool copr-status --disable-self-update
