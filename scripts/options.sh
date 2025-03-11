@@ -71,7 +71,7 @@ fail_arg() {
 }
 
 print_options() {
-  echo_color -e "\nUsing options:"
+  echo "Using options:"
 
   echo_color -n "\tDISABLE_SELF_UPDATE:"
   echo " $disable_self_update"
@@ -102,7 +102,7 @@ set_environment() {
 
   # Override global options with .env file
   if [ -f "./.env" ]; then
-    echo -e "\nFound environment file"
+    echo -e "Found environment file"
     source "./.env"
   fi
 

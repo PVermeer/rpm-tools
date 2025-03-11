@@ -20,6 +20,12 @@ export RPM_COPR_BUILD="false"
 export RPM_SPEC_UPDATE="false"
 export UPDATE_SELF="false"
 
+# Dependencies
+# Installing dependencies
+echo_color "\n=== Installing dependencies ==="
+install_dependencies || fail "Could not install dependencies"
+echo_success "All good now"
+
 # Script options
 echo_color "\n=== Setting up options ==="
 
