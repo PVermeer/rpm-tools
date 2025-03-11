@@ -36,6 +36,13 @@ jobs:
       COPR_PACKAGE: ${{ inputs.copr_package }}
 
     steps:
+      - name: Container setup
+        run: dnf install -y git
+
       - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: ./rpm-tool install-deps
+
       - name: Check COPR status
         run: ./rpm-tool copr-status
