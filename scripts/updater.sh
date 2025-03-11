@@ -7,6 +7,11 @@ update_self() {
   fi
 
   local git_repo="https://github.com/PVermeer/rpm-tools"
+  local is_this_git_repo=$(git config --get remote.origin.url | grep -i "PVermeer/rpm-tools")
+  if [ -n "$is_this_git_repo" ]; then
+    echo "This is the main repo of <rpm-tools>, no need to update"
+    return 1
+  fi
 
   local rpm_tools_submodule=$(get_submodule_path_from_url "$git_repo") || $(get_submodule_path_from_url "$git_repo.git") || true
 

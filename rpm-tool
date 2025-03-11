@@ -53,6 +53,7 @@ if [ "$disable_self_update" = "true" ]; then
 else
   if update_self; then
     UPDATE_SELF="true"
+    # Don't need to reload if only set to update and do nothing
     if [ "$update_self" = "false" ]; then
       echo_warning -e "\n========== LOADING UPDATE ==========\n"
       exec $script_dir/rpm-tool $@ --disable-self-update

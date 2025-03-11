@@ -67,7 +67,7 @@ update_submodules() {
 
     submodule_path=$(get_submodule_path_from_url $repo || echo "")
 
-    if [ -z "$submodule_path" ]; then
+    if [ -z "$submodule_path" ] || [ -d "$submodule_path" ]; then
       add_submodule $repo || true
       submodule_path=$(get_submodule_path_from_url $repo || echo "")
     fi
