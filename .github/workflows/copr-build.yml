@@ -80,7 +80,7 @@ jobs:
           cd repo
           ../rpm-tools/rpm-tool copr-status --disable-self-update
           source $XDG_RUNTIME_DIR/rpm-tool-vars
-          echo "COPR_STATUS=$copr_status" >> $GITHUB_ENV
+          echo "COPR_STATUS=$COPR_STATUS" >> $GITHUB_ENV
 
       - name: Commit changes
         if: ${{ env.RPM_SPEC_UPDATE == 'true' }}
