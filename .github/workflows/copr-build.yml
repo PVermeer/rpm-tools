@@ -1,0 +1,96 @@
+name: COPR build
+
+on:
+  workflow_call:
+    inputs:
+      spec_file:
+        description: Spec-file path
+        required: true
+        type: string
+
+      copr_owner:
+        description: COPR owner
+        required: true
+        type: string
+
+      copr_project:
+        description: COPR project
+        required: true
+        type: string
+
+      copr_package:
+        description: COPR package name
+        required: true
+        type: string
+
+    secrets:
+      COPR_WEBHOOK:
+        description: COPR webhook (SECRET)
+        required: true
+
+jobs:
+  build_rpm_copr:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    name: Build rpm on COPR
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      SPEC_FILE: ${{ inputs.spec_file }}
+      COPR_OWNER: ${{ inputs.copr_owner }}
+      COPR_PROJECT: ${{ inputs.copr_project }}
+      COPR_PACKAGE: ${{ inputs.copr_package }}
+      COPR_WEBHOOK: ${{ secrets.COPR_WEBHOOK }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RPM_SPEC_UPDATE: "false"
+      COPR_SUCCEEDED: "true"
+
+    steps:
+      - name: Container setup
+        run: dnf install -y git
+
+      - name: Checkout rpm-tools
+        uses: actions/checkout@v4
+        with:
+          repository: pvermeer/rpm-tools
+          path: rpm-tools
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+          path: repo
+
+      - name: Install dependencies
+        run: |
+          cd repo
+          ../rpm-tools/rpm-tool install-deps --disable-self-update
+
+      - name: Update RPM
+        run: |
+          cd repo
+          source ../rpm-tools/rpm-tool update --update-submodules --disable-self-update
+          echo "RPM_SPEC_UPDATE=$RPM_SPEC_UPDATE" >> $GITHUB_ENV
+
+      - name: Check COPR status
+        run: |
+          cd repo
+          source ../rpm-tools/rpm-tool copr-status --disable-self-update || true
+          echo "COPR_SUCCEEDED=$COPR_SUCCEEDED" >> $GITHUB_ENV
+
+      - name: Commit changes
+        if: ${{ env.RPM_SPEC_UPDATE == 'true' }}
+        run: |
+          cd repo
+          git config --local user.email "action@github.com"
+          git config --local user.name "CI"
+          git commit -a -m "build(github-actions): automated update [skip ci]"
+          git push
+
+      - name: Build on COPR
+        if: ${{ env.RPM_SPEC_UPDATE == 'true' || env.COPR_SUCCEEDED == 'false' }}
+        run: |
+          cd repo
+          ../rpm-tools/rpm-tool copr-build --disable-self-update

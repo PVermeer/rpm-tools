@@ -41,6 +41,7 @@ usage() {
       [ update ] Update the RPM spec file to latest commit(s)
         [ --update-submodules ] Update / Add submodules
         [ --apply-patches ] Apply patches to submodules
+  
         Requires the spec file to have the following %global vars:
           [ %global repository<number> ] Url to repo
           [ %global commit<number> ] The latest commit on which the rpm was built
@@ -62,6 +63,7 @@ usage() {
     RPM_COPR_BUILD=\"false\" || \"true\"
     RPM_SPEC_UPDATE=\"false\" || \"true\"
     SELF_UPDATE=\"false\" || \"true\"
+    COPR_SUCCEEDED=\"false\" || \"true\"
 "
 }
 

@@ -26,10 +26,12 @@ get_copr_status() {
 
   if [ "$error" = "null" ]; then
     echo_success $build_state
+    COPR_SUCCEEDED="true"
     return 0
   fi
 
   echo_error $error
+  COPR_SUCCEEDED="false"
   return 1
 }
 

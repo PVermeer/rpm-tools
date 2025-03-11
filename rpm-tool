@@ -19,6 +19,7 @@ export RPM_LOCAL_BUILD="false"
 export RPM_COPR_BUILD="false"
 export RPM_SPEC_UPDATE="false"
 export UPDATE_SELF="false"
+export COPR_SUCCEEDED="false"
 
 # Script options
 echo_color "\n=== Setting up options ==="
@@ -107,6 +108,7 @@ if [ $copr_build = "true" ]; then
   fi
 fi
 
+# === COPR Status ===
 if [ $copr_status = "true" ]; then
 
   echo_color "\n=== COPR status ===\n"

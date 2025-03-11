@@ -1,0 +1,19 @@
+name: Daily COPR build
+
+on:
+  schedule:
+    - cron: "30 6 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  COPR_build:
+    uses: ./.github/workflows/copr-build.yml
+    with:
+      spec_file: ./rpm-tool.spec
+      copr_owner: pvermeer
+      copr_project: rpm-tools-test
+      copr_package: rpm-tool
+    permissions:
+      contents: write
+    secrets:
+      COPR_WEBHOOK: ${{ secrets.COPR_WEBHOOK }}
