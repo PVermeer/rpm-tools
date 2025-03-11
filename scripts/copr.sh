@@ -25,11 +25,11 @@ get_copr_status() {
   local error="$(echo $response | jq -r '.error')"
 
   if [ "$error" = "null" ]; then
-    echo $build_state
+    echo_success $build_state
     return 0
   fi
 
-  echo $error
+  echo_error $error
   return 1
 }
 
