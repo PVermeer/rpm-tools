@@ -1,0 +1,41 @@
+name: COPR status
+
+on:
+  workflow_call:
+    inputs:
+      spec_file:
+        description: Spec-file path
+        required: true
+        type: string
+
+      copr_owner: 
+        description: COPR owner
+        required: true
+        type: string
+
+      copr_project:
+        description: COPR project
+        required: true
+        type: string
+
+      copr_package:
+        description: COPR package name
+        required: true
+        type: string
+
+jobs:
+  check_COPR_build_status:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    name: Check copr build status
+    timeout-minutes: 5
+    env:
+      SPEC_FILE: ${{ inputs.spec_file }}
+      COPR_OWNER: ${{ inputs.copr_owner }}
+      COPR_PROJECT: ${{ inputs.copr_project }}
+      COPR_PACKAGE: ${{ inputs.copr_package }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check COPR status
+        run: ./rpm-tool copr-status
