@@ -20,11 +20,6 @@ export RPM_COPR_BUILD="false"
 export RPM_SPEC_UPDATE="false"
 export UPDATE_SELF="false"
 
-# Dependencies
-# Installing dependencies
-echo_color "\n=== Installing dependencies ==="
-install_dependencies || fail "Could not install dependencies"
-
 # Script options
 echo_color "\n=== Setting up options ==="
 
@@ -33,9 +28,18 @@ set_arguments $@
 print_options
 
 # Required options
-if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ] && [ "$update_self" = "false" ]; then
+if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ] && [ "$update_self" = "false" ] && [ "$install_deps" = "false" ]; then
   fail_arg "Please provide a 'build / status / update' option"
 fi
+
+# Dependencies
+echo_color "\n=== Installing dependencies ==="
+install_dependencies || fail "Could not install dependencies"
+if [ "$install_deps" = "true" ]; then
+  echo ""
+  exit 0
+fi
+
 if [ -z $spec_file ]; then
   fail_arg "No spec-file provided"
 fi
@@ -110,7 +114,7 @@ if [ $copr_status = "true" ]; then
   echo_color "Getting status"
   is_succeeded="false"
   build_state=$(get_copr_status) && is_succeeded="true" || true
-  
+
   echo "Copr build status: $build_state"
 
   if [ "$is_succeeded" = "false" ]; then

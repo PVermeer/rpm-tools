@@ -1,6 +1,7 @@
 #!/bin/bash
 
 spec_file=""
+install_deps="false"
 disable_self_update="false"
 copr_webhook=""
 build="false"
@@ -18,6 +19,7 @@ without_local="false"
 
 usage() {
   echo -e "$script_name usage:
+    [ install-deps ] Precheck dependencies and install them (dnf)
 
     [ --spec-file SPEC-FILE ] Spec-file path
     [ --disable-self-update ] Disable self updating of this application
@@ -126,7 +128,7 @@ set_environment() {
 }
 
 set_arguments() {
-  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,without-local,update-self,build,update,copr-build,copr-status"
+  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,without-local,install-deps,update-self,build,update,copr-build,copr-status"
   local short_arguments=""
 
   local parsed_arguments=$(getopt --options=$short_arguments --longoptions=$long_arguments --name "$0" -- "$@") || exit 1
@@ -196,6 +198,10 @@ set_arguments() {
       ;;
     update-self)
       update_self="true"
+      shift
+      ;;
+    install-deps)
+      install_deps="true"
       shift
       ;;
     --)

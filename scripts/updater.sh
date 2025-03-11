@@ -17,7 +17,7 @@ update_self() {
 
   if [ -n "$rpm_tools_submodule" ]; then
     local current_commit=$(git submodule status | grep $rpm_tools_submodule | awk '{ print $1 }')
-    # Remove leading '+'' if submodule update is not commited yet
+    # Remove leading '+' if submodule update is not commited yet
     current_commit=$(echo $current_commit | sed "s/\+/""/")
 
     local latest_commit=$(git ls-remote "$git_repo" "HEAD" | awk '{ print $1 }')
