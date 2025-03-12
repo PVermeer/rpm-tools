@@ -6,7 +6,7 @@
 %global author pvermeer
 %global source copr_realtek-alc887-vd
 %global sourcerepo https://github.com/pvermeer/copr_realtek-alc887-vd
-%global commit 7615a58dfa1c7239f02aafa163573ff884576e3b
+%global commit dbd6a2dc2f54b9bf89c86e34d750fbb75879865c
 %global versioncommit %(echo -n %{commit} | head -c 8)
 
 # Source repo 2
@@ -30,13 +30,13 @@ Url: %{coprrepo}
 
 BuildRequires: git
 
+%description
+RPM build to test the rpm-tools
+
 %define workdir %{_builddir}/%{name}
 %define coprdir %{workdir}/%{coprsource}
 %define sourcedir %{workdir}/%{source}
 %define sourcedir2 %{workdir}/%{source2}
-
-%description
-RPM build to test the rpm-tools
 
 %prep
 # To apply working changes handle sources / patches locally
