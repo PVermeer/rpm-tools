@@ -113,15 +113,21 @@ fi
 if [ $copr_status = "true" ]; then
   echo_color "\n=== COPR status ==="
 
-  is_succeeded="false"
-  build_state=$(get_copr_status) && is_succeeded="true" || true
+  on_error() {
+    echo_error "$build_state"
+    build_state="null"
+    COPR_STATUS="$build_state"
+    exit 1
+  }
+  build_state=$(get_copr_status) || on_error
   COPR_STATUS="$build_state"
 
   echo -n "Copr build status: "
-  if [ "$is_succeeded" = "true" ]; then
-    echo_success "$build_state"
-  else
+  if [ "$build_state" = "failed" ]; then
     echo_error "$build_state"
     exit 1
+  else
+    echo_success "$build_state"
+    exit 0
   fi
 fi
