@@ -25,7 +25,7 @@ update_self() {
     # Remove leading '+' if submodule update is not commited yet
     current_commit=$(echo $current_commit | sed "s/\+/""/")
 
-    local latest_commit=$(git ls-remote "$git_repo" "HEAD" | awk '{ print $1 }')
+    local latest_commit=$(git ls-remote "$git_repo" "HEAD" | awk 'NR==1{ print $1 }')
 
     if [ "$current_commit" != "$latest_commit" ]; then
       if git submodule update --init --remote -f $rpm_tools_submodule; then

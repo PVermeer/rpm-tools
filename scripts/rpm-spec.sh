@@ -89,7 +89,7 @@ get_new_commit() {
 
   repo=$1
   branch=$2
-  new_commit=$(git ls-remote "$repo" $branch | awk '{ print $1 }') || return 1
+  new_commit=$(git ls-remote "$repo" $branch | awk 'NR==1{ print $1 }') || return 1
 
   echo $new_commit
 }
