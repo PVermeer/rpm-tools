@@ -9,7 +9,7 @@ update_self() {
   local git_repo="https://github.com/PVermeer/rpm-tools"
   local is_this_git_repo=$(git config --get remote.origin.url | grep -i "PVermeer/rpm-tools")
   if [ -n "$is_this_git_repo" ]; then
-    echo "This is the main repo of <rpm-tools>, no need to update"
+    echo "This is the main repo <PVermeer/rpm-tools>, no need to update"
     return 1
   fi
 

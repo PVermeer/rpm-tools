@@ -35,10 +35,10 @@ if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false
 fi
 
 # Dependencies
-echo_color "\n=== Installing dependencies ==="
-install_dependencies || fail "Could not install dependencies"
+echo_color "\n=== Checking dependencies ==="
+check_dependencies
 if [ "$install_deps" = "true" ]; then
-  echo ""
+  echo "Installing deps not implemented yet"
   exit 0
 fi
 
@@ -65,7 +65,6 @@ fi
 # === BUILD RPM ===
 if [ $build = "true" ]; then
   echo_color "\n=== RPM build ==="
-
   build_rpm
 fi
 
@@ -126,4 +125,3 @@ if [ $copr_status = "true" ]; then
     exit 1
   fi
 fi
-

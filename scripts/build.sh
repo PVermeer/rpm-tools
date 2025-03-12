@@ -1,9 +1,38 @@
 #!/bin/bash
 
+print_rpm_files() {
+  echo_color "\nRPM file contents:"
+
+  # One-by-one for some separation
+  for file in ./rpmbuild/SRPMS/*.rpm; do
+    echo_color -e -n "\nSource RPM: "
+    echo " $file"
+
+    echo_color "files:"
+    rpm -qvlp $file
+
+    echo_color "scripts:"
+    rpm -qp --scripts $file
+  done
+
+  echo ""
+
+  for file in ./rpmbuild/RPMS/**/*.rpm; do
+    echo_color -e -n "\nRPM: "
+    echo " $file"
+
+    echo_color "files:"
+    rpm -qvlp $file
+
+    echo_color "scripts:"
+    rpm -qp --scripts $file
+  done
+}
+
 build_rpm() {
   rm -rf ./rpmbuild
 
-  echo_color "\nCopying sources / patches:"
+  echo_color "Copying sources / patches:"
   mkdir -p ./rpmbuild/SOURCES
 
   # SOURCE RPM builds do not accept anything in sub directories...
@@ -31,30 +60,7 @@ build_rpm() {
     run_debug rpmbuild --define "_topdir $PWD/rpmbuild" -ba --noclean --with local ./$spec_file
   fi
 
-  echo_color "\n=== RPM Contents ==="
-  # One-by-one for some separation
-
-  for file in ./rpmbuild/SRPMS/*.rpm; do
-    echo_color "\nSource RPM <$file>:"
-
-    echo_color "\nFiles:"
-    rpm -qvlp $file
-
-    echo_color "\nScripts:"
-    rpm -qp --scripts $file
-  done
-
-  echo ""
-
-  for file in ./rpmbuild/RPMS/**/*.rpm; do
-    echo_color "\nRPM <$file>:"
-
-    echo_color "\nFiles:"
-    rpm -qvlp $file
-
-    echo_color "\nScripts:"
-    rpm -qp --scripts $file
-  done
-
   RPM_LOCAL_BUILD="true"
+
+  print_rpm_files
 }
