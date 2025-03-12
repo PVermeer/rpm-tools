@@ -38,7 +38,7 @@ fi
 echo_color "\n=== Checking dependencies ==="
 check_dependencies
 if [ "$install_deps" = "true" ]; then
-  echo "Installing deps not implemented yet"
+  echo "Installing dependencies not implemented yet"
   exit 0
 fi
 

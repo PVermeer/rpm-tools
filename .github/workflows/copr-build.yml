@@ -31,7 +31,6 @@ on:
 jobs:
   build_rpm_copr:
     runs-on: ubuntu-latest
-    container: fedora:latest
     name: Build rpm on COPR
     timeout-minutes: 5
     permissions:
@@ -47,9 +46,6 @@ jobs:
       COPR_STATUS: "null"
 
     steps:
-      - name: Container setup
-        run: dnf install -y git
-
       - name: Checkout rpm-tools
         uses: actions/checkout@v4
         with:
@@ -62,11 +58,6 @@ jobs:
           fetch-depth: 0
           submodules: true
           path: repo
-
-      - name: Install dependencies
-        run: |
-          cd repo
-          ../rpm-tools/rpm-tool install-deps --disable-self-update
 
       - name: Update RPM
         run: |

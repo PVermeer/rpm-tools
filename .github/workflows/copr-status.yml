@@ -26,7 +26,6 @@ on:
 jobs:
   check_COPR_build_status:
     runs-on: ubuntu-latest
-    container: fedora:latest
     name: Check copr build status
     timeout-minutes: 5
     env:
@@ -36,9 +35,6 @@ jobs:
       COPR_PACKAGE: ${{ inputs.copr_package }}
 
     steps:
-      - name: Container setup
-        run: dnf install -y git
-
       - name: Checkout rpm-tools
         uses: actions/checkout@v4
         with:
@@ -49,11 +45,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: repo
-
-      - name: Install dependencies
-        run: |
-          cd repo
-          ../rpm-tools/rpm-tool install-deps --disable-self-update
 
       - name: Check COPR status
         run: |

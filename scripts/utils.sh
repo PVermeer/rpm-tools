@@ -36,7 +36,7 @@ check_dependencies() {
   if ! which jq &>/dev/null; then missing_deps+=("jq"); fi
   if ! which rpmbuild &>/dev/null; then missing_deps+=("rpmbuild"); fi
 
-  if [ -n "$missing_deps" ]; then
+  if [ ${#missing_deps[@]} -gt 0 ]; then
     echo -n "Missing packages: "
     echo_color "${missing_deps[@]}"
   else
