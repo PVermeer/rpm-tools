@@ -121,6 +121,7 @@ apply_patches() {
       for file in ../patches/$path/*.patch; do
         echo_color "\nPatching <$file>:"
         git apply -v $file
+        sleep 0.1
       done
     else
       echo -n "No patches for "
