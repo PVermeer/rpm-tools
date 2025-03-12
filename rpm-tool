@@ -62,12 +62,6 @@ else
   fi
 fi
 
-# === BUILD RPM ===
-if [ $build = "true" ]; then
-  echo_color "\n=== RPM build ==="
-  build_rpm
-fi
-
 # === UPDATE RPM ===
 if [ $update = "true" ]; then
   echo_color "\n=== Update RPM ==="
@@ -88,7 +82,12 @@ if [ $update = "true" ]; then
     echo_color "\nApplying patches"
     apply_patches
   fi
+fi
 
+# === BUILD RPM ===
+if [ $build = "true" ]; then
+  echo_color "\n=== RPM build ==="
+  build_rpm
 fi
 
 # === COPR ===
