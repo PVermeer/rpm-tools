@@ -103,7 +103,7 @@ update_spec_repos() {
   global_spec_vars=$(get_global_vars_from_spec $spec_file)
   rpm_updated="false"
  
-  echo_color -e "Looking for remote changes\n"
+  echo -e "Looking for remote changes\n"
 
   local keyValue
   for keyValue in $global_spec_vars; do
@@ -137,11 +137,11 @@ update_spec_repos() {
     if [ "$current_commit" = "$new_commit" ]; then
       echo -e "\nNo change detected"
     else
-      echo -e "\nChange detected"
+      echo_warning -e "\nChange detected"
 
       sed -i "s/%global\scommit$repo_match_number\s.*/%global commit$repo_match_number $new_commit/" ./$spec_file
 
-      echo "RPM spec updated"
+      echo_success "RPM spec updated"
       RPM_SPEC_UPDATE="true"
     fi
     echo ""

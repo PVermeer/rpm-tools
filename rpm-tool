@@ -70,7 +70,7 @@ fi
 
 # === UPDATE RPM ===
 if [ $update = "true" ]; then
-  echo_color "\n=== Update RPM ===\n"
+  echo_color "\n=== Update RPM ==="
 
   update_spec_repos $spec_file
 

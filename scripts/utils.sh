@@ -23,6 +23,7 @@ export_variables_to_tmp() {
     echo "${status_vars[*]}" >$status_file
   )
 
+  echo ""
   echo_success "Wrote status file > $status_file:"
   cat $status_file
   echo ""

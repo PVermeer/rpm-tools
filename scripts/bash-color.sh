@@ -137,7 +137,7 @@ echo_success() {
 echo_debug() {
   local arguments=$@
   parse_arguments $arguments
-  echo -e $switches "${tracecolor}✓ $arguments${removecolor}"
+  echo -e $switches "${tracecolor}$arguments${removecolor}"
 }
 
 # Trace colors for set -x
