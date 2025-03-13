@@ -100,9 +100,9 @@ function undirect() { exec 2>&9; }
 function redirect() { exec 2>&8; }
 trap "redirect;" DEBUG
 PROMPT_COMMAND='undirect;'
-export BASH_XTRACEFD=1 # set -x to stdout
 
 # Trace color `set -x`
+export BASH_XTRACEFD=1 # set -x to stdout
 exec 7> >(
   while IFS='' read -r line || [ -n "$line" ]; do
     echo -e "\t${tracecolor}${line}${removecolor}"

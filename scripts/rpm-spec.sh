@@ -5,6 +5,46 @@ get_global_vars_from_spec() {
   echo $(grep '^%global\s.*$' $spec_file | awk '{ print $2"="$3 }')
 }
 
+get_source_repo_urls_from_spec() {
+  local spec_file=$1
+  local global_spec_vars
+  global_spec_vars=$(get_global_vars_from_spec $spec_file)
+  local repo_urls=()
+
+  local keyValue
+  for keyValue in $global_spec_vars; do
+    local key
+    local value
+    local repo
+
+    key=$(get_key $keyValue)
+    value=$(get_value $keyValue)
+
+    if [[ ! $key = sourcerepo* ]]; then continue; fi
+    repo=$value
+    repo_urls+=("$repo")
+  done
+
+  echo "${repo_urls[@]}"
+}
+
+get_source_repo_paths_from_spec() {
+  local spec_file=$1
+  local source_repo_urls
+  source_repo_urls=$(get_source_repo_urls_from_spec $spec_file)
+  local repo_paths=()
+
+  local url
+  for url in ${source_repo_urls}; do
+    local repo_path
+    repo_path=$(get_submodule_path_from_url $url)
+    if [ -z "$repo_path" ]; then continue; fi
+    repo_paths+=("$repo_path")
+  done
+
+  echo "${repo_paths[@]}"
+}
+
 get_key() {
   echo $1 | awk -F '=' '{ print $1 }'
 }
@@ -35,7 +75,6 @@ find_matching_branch() {
     if [[ $key = branch* ]]; then
       local branch_match_number
       branch_match_number=$(get_match_number $key)
-
 
       if [ "$repo_match_number" = "$branch_match_number" ]; then
         branch=$value
@@ -102,7 +141,7 @@ update_spec_repos() {
   spec_file=$1
   global_spec_vars=$(get_global_vars_from_spec $spec_file)
   rpm_updated="false"
- 
+
   echo -e "Looking for remote changes\n"
 
   local keyValue

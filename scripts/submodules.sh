@@ -14,7 +14,7 @@ get_submodule_path_from_url() {
   echo $path
 }
 
-get_submodule_paths() {
+get_git_submodule_paths() {
   local config_paths
   local submodule_paths=""
 
@@ -67,8 +67,8 @@ update_submodules() {
 
     submodule_path=$(get_submodule_path_from_url $repo || echo "")
 
-    if [ -z "$submodule_path" ] || [ -d "$submodule_path" ]; then
-      add_submodule $repo || true
+    if [ -z "$submodule_path" ] || [ ! -d "$submodule_path" ]; then
+      add_submodule $repo
       submodule_path=$(get_submodule_path_from_url $repo || echo "")
     fi
 
@@ -100,12 +100,11 @@ update_submodules() {
 
 apply_patches() {
   local submodule_paths
-
   if [ ! -f ./.gitmodules ]; then
     echo_warning "No submodules in repo"
     return
   fi
-  submodule_paths=$(get_submodule_paths)
+  submodule_paths=$(get_source_repo_paths_from_spec $spec_file)
 
   local path
   for path in $submodule_paths; do
@@ -114,21 +113,21 @@ apply_patches() {
     cd "./$path"
 
     # One-by-one so the filename of the patch is printed
-    set +e
-
-    if ls $patch_files 1>/dev/null 2>&1; then
+    if ls $patch_files &>/dev/null; then
       local file
       for file in ../patches/$path/*.patch; do
-        echo_color "\nPatching <$file>:"
-        git apply -v $file
-        sleep 0.1
+        echo -n -e "\nPatching "
+        echo_color -n "$file"
+        echo ":"
+
+        git apply -v $file || true
+        sleep 0.1 # Allow buffer flush output
       done
+      echo ""
     else
       echo -n "No patches for "
       echo_color "$path"
     fi
-    set -e
-
     cd ".."
   done
 }
