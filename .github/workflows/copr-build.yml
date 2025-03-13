@@ -69,7 +69,7 @@ jobs:
       - name: Check COPR status
         run: |
           cd repo
-          ../rpm-tools/rpm-tool copr-status --disable-self-update
+          ../rpm-tools/rpm-tool copr-status --disable-self-update || true
           source $XDG_RUNTIME_DIR/rpm-tool-vars
           echo "COPR_STATUS=$COPR_STATUS" >> $GITHUB_ENV
 
