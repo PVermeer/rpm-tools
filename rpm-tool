@@ -90,13 +90,13 @@ if [ $build = "true" ]; then
   build_rpm
 fi
 
-# === COPR ===
+# === COPR build ===
 if [ $copr_build = "true" ]; then
 
-  echo_color "\n=== COPR build ===\n"
+  echo_color "\n=== COPR build ==="
 
   build_on_copr
-  echo_color "Build triggered on COPR"
+  echo_success "Build triggered on COPR"
 
   if [ $copr_watch = "true" ]; then
 

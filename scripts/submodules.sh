@@ -34,12 +34,14 @@ add_submodule() {
   local repo
   repo=$1
 
-  echo -en "\nAdding new submodule: "
+  echo -en "Adding new submodule: "
   echo_color -e "$repo"
   git submodule add $repo
 }
 
 update_submodules() {
+  echo "Checking out sources as submodules"
+
   local global_spec_vars
   global_spec_vars=$(get_global_vars_from_spec $spec_file)
 
@@ -54,6 +56,7 @@ update_submodules() {
 
     if [[ ! $key = sourcerepo* ]]; then continue; fi
     repo=$value
+    echo ""
 
     # Add repo if not in .gitmodules
     if [ ! -f ./.gitmodules ]; then
@@ -93,12 +96,12 @@ update_submodules() {
     git reset --hard $commit
     git submodule update --init --recursive --checkout --force
     cd ..
-
-    echo ""
   done
 }
 
 apply_patches() {
+  echo "Checking patch files"
+
   local submodule_paths
   if [ ! -f ./.gitmodules ]; then
     echo_warning "No submodules in repo"
@@ -112,18 +115,18 @@ apply_patches() {
 
     cd "./$path"
 
+    echo ""
     # One-by-one so the filename of the patch is printed
     if ls $patch_files &>/dev/null; then
       local file
       for file in ../patches/$path/*.patch; do
-        echo -n -e "\nPatching "
+        echo -n -e "Patch "
         echo_color -n "$file"
         echo ":"
 
         git apply -v $file || true
         sleep 0.1 # Allow buffer flush output
       done
-      echo ""
     else
       echo -n "No patches for "
       echo_color "$path"

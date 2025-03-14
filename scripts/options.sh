@@ -91,8 +91,6 @@ print_options() {
   echo " $copr_package"
   echo_color -n "\tCOPR_WEBHOOK:"
   if [ -n "$copr_webhook" ]; then echo " ***"; else echo ""; fi
-
-  echo ""
 }
 
 set_environment() {

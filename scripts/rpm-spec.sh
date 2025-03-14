@@ -142,7 +142,7 @@ update_spec_repos() {
   global_spec_vars=$(get_global_vars_from_spec $spec_file)
   rpm_updated="false"
 
-  echo -e "Looking for remote changes\n"
+  echo -e "Looking for remote changes"
 
   local keyValue
   for keyValue in $global_spec_vars; do
@@ -169,20 +169,20 @@ update_spec_repos() {
     new_commit=$(get_new_commit $repo_value $branch || fail "Unable to get git ref")
     if [ -z $new_commit ]; then fail "Unable to get latest commit"; fi
 
+    echo ""
     echo_color -n "$repo_value <$branch>:"
     echo " $current_commit -> $new_commit"
 
     # Checking for changes
     if [ "$current_commit" = "$new_commit" ]; then
-      echo -e "\nNo change detected"
+      echo_success -e "No change detected"
     else
-      echo_warning -e "\nChange detected"
+      echo_warning -e "Change detected"
 
       sed -i "s/%global\scommit$repo_match_number\s.*/%global commit$repo_match_number $new_commit/" ./$spec_file
 
       echo_success "RPM spec updated"
       RPM_SPEC_UPDATE="true"
     fi
-    echo ""
   done
 }

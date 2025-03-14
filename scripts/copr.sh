@@ -5,7 +5,7 @@ build_on_copr() {
     fail_arg "Please provide the COPR webhook --copr-webhook"
   fi
 
-  echo_color "Sending build request to Copr"
+  echo "Sending build request to Copr"
 
   curl --fail-with-body --no-progress-meter -X POST $copr_webhook || fail "The COPR webhook failed"
 
@@ -34,7 +34,7 @@ get_copr_status() {
 }
 
 copr_watch() {
-  echo_color "\n=== Watching status ===\n"
+  echo_color "\nWatching COPR build status"
 
   local build_state=""
   until [ "$build_state" = "succeeded" ] || [ "$build_state" = "failed" ]; do
@@ -48,15 +48,15 @@ copr_watch() {
     COPR_STATUS="$build_state"
 
     if [ "$build_state" = "succeeded" ]; then
-      echo "Copr build status: $(echo_success $build_state) $(date)"
+      echo "Copr build status: $(echo_success $build_state) on $(date)"
       break
     elif [ "$build_state" = "failed" ]; then
-      echo "Copr build status: $(echo_error $build_state) $(date)"
+      echo "Copr build status: $(echo_error $build_state) on $(date)"
       exit 1
     elif [ "$build_state" = "null" ] || [ -z "$build_state" ]; then
-      fail "Could not get build state from COPR"
+      fail "Could not get build state from COPR on $(date)"
     else
-      echo "Copr build status: $build_state $(date)"
+      echo "Copr build status: $(echo_warning $build_state) on $(date)"
       sleep 10
     fi
   done
