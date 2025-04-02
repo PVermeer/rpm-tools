@@ -30,7 +30,7 @@ set_arguments $@
 print_options
 
 # Required options
-if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ] && [ "$update_self" = "false" ] && [ "$install_deps" = "false" ]; then
+if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ] && [ "$update_self" = "false" ] && [ "$install_deps" = "false" ] && [ "$update_submodules" = "false" ]; then
   fail_arg "Please provide a 'build / status / update' option"
 fi
 
@@ -77,6 +77,17 @@ if [ $update = "true" ]; then
     echo_color "\nUpdating submodules"
     update_submodules
   fi
+
+  if [ $apply_patches = "true" ]; then
+    echo_color "\nApplying patches"
+    apply_patches
+  fi
+fi
+
+# === UPDATE SUBMODULES ===
+if [ $update_submodules = "true" ]; then
+  echo_color "\nUpdating submodules"
+  update_submodules
 
   if [ $apply_patches = "true" ]; then
     echo_color "\nApplying patches"
