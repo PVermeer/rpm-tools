@@ -109,28 +109,36 @@ apply_patches() {
   fi
   submodule_paths=$(get_source_repo_paths_from_spec $spec_file)
 
+  local failed="false"
   local path
   for path in $submodule_paths; do
     local patch_files="../patches/$path/*.patch"
 
     cd "./$path"
 
-    echo ""
     # One-by-one so the filename of the patch is printed
     if ls $patch_files &>/dev/null; then
       local file
       for file in ../patches/$path/*.patch; do
-        echo -n -e "Patch "
+        echo -n -e "\nPatch "
         echo_color -n "$file"
         echo ":"
 
-        git apply -v $file || true
+        if ! git apply -v $file; then
+          failed="true"
+          echo_warning "PATCH FAILED"
+        fi
         sleep 0.1 # Allow buffer flush output
       done
     else
-      echo -n "No patches for "
+      echo -e -n "\nNo patches for "
       echo_color "$path"
     fi
     cd ".."
   done
+
+  if [ "$failed" = "true" ]; then
+    echo_error -e "\nSome patches failed to apply!" >&2
+    return 1
+  fi
 }
