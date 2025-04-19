@@ -37,7 +37,7 @@ copr_watch() {
   echo_color "\nWatching COPR build status"
 
   local build_state=""
-  until [ "$build_state" = "succeeded" ] || [ "$build_state" = "failed" ]; do
+  until [ "$build_state" = "succeeded" ] || [ "$build_state" = "failed" ] || [ "$build_state" = "canceled" ]; do
 
     on_error() {
       echo_error "$build_state"
@@ -55,6 +55,8 @@ copr_watch() {
       exit 1
     elif [ "$build_state" = "null" ] || [ -z "$build_state" ]; then
       fail "Could not get build state from COPR on $(date)"
+    elif [ "$build_state" = "canceled" ] || [ -z "$build_state" ]; then
+      fail "Copr build has been canceled on $(date)"
     else
       echo "Copr build status: $(echo_warning $build_state) on $(date)"
       sleep 10

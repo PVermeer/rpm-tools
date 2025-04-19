@@ -22,7 +22,7 @@
 %global coprsource rpm-tools
 
 Name: rpm-tool
-Version: 0.0.0
+Version: 0.0.1
 Release: %{versioncommit}.%{versioncommit2}%{?dist}
 License: GPL-3.0 license
 Summary: RPM build to test the rpm-tools.

@@ -45,6 +45,49 @@ get_source_repo_paths_from_spec() {
   echo "${repo_paths[@]}"
 }
 
+get_release_var_from_spec() {
+  local spec_file=$1
+  local release_var=$(grep -E '^Release:\s[0-9]+\..*%\{\?dist\}' $spec_file)
+  echo $release_var
+}
+
+increment_release_value_on_spec() {
+  local spec_file=$1
+  local has_release="true"
+  local new_release_value="1"
+
+  local release_var=$(get_release_var_from_spec $spec_file)
+  if [ -z "$release_var" ]; then
+    has_release="false"
+    release_var=$(grep -E '^Release:\s.*%\{\?dist\}' $spec_file)
+  fi
+  if [ -z "$release_var" ]; then
+    fail "No 'Release: [0-9].*%{?dist}' found in spec file"
+  fi
+
+  if [ "$has_release" = "true" ]; then
+    local current_release_value=$(echo $release_var | awk '{ print $2 }' | awk -F . '{ print $1 }')
+    new_release_value=$((current_release_value + 1))
+  fi
+
+  local trail=""
+  if [ "$has_release" == "true" ]; then
+    trail=$(echo $release_var | cut -d. -f2-)
+  else
+    trail=$(echo $release_var | cut -d ' ' -f2-)
+  fi
+
+  sed -i "s/$release_var/Release: $new_release_value.$trail/" ./$spec_file
+}
+
+has_release_value_on_spec() {
+  local spec_file=$1
+  local release_var=$(get_release_var_from_spec $spec_file)
+  if [ -z "$release_var" ]; then
+    return 1
+  fi
+}
+
 get_key() {
   echo $1 | awk -F '=' '{ print $1 }'
 }
@@ -179,10 +222,16 @@ update_spec_repos() {
     else
       echo_warning -e "Change detected"
 
+      # Update commit
       sed -i "s/%global\scommit$repo_match_number\s.*/%global commit$repo_match_number $new_commit/" ./$spec_file
 
       echo_success "RPM spec updated"
       RPM_SPEC_UPDATE="true"
     fi
   done
+
+  if [ "$RPM_SPEC_UPDATE" = "true" ] || ! has_release_value_on_spec $spec_file; then
+    increment_release_value_on_spec $spec_file
+    RPM_SPEC_UPDATE="true"
+  fi
 }
