@@ -4,8 +4,9 @@ build_on_copr() {
   if [ -z $copr_webhook ]; then
     fail_arg "Please provide the COPR webhook --copr-webhook"
   fi
+  git_check_for_changes
 
-  echo "Sending build request to Copr"
+  echo_color "\nSending build request to Copr"
 
   curl --fail-with-body --no-progress-meter -X POST $copr_webhook || fail "The COPR webhook failed"
 

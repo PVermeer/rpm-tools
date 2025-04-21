@@ -44,3 +44,17 @@ check_dependencies() {
     echo "No missing packages"
   fi
 }
+
+git_check_for_changes() {
+  echo_color "Checking git"
+
+  git status --short --ignore-submodules | grep -E '^.*\.spec$' && fail "Spec file has been updated, but not commited to git"
+
+  git status --short --ignore-submodules | grep -E '^.*patches/.*$' && fail "Patches have been updated, but not commited to git"
+
+  git status --short --ignore-submodules | grep -E '^.*sources/.*$' && fail "Sources have been updated, but not commited to git"
+
+  git fetch && git log HEAD --oneline --not --remotes | grep '.*' && fail "Some commits are not pushed to remote"
+
+  echo "No changes detected"
+}
