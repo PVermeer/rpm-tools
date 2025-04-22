@@ -65,22 +65,11 @@ fi
 # === UPDATE RPM ===
 if [ $update = "true" ]; then
   echo_color "\n=== Update RPM ==="
-
   update_spec_repos $spec_file
 
   if [ "$RPM_SPEC_UPDATE" = "true" ]; then
     echo_color "\nNew spec file:"
     cat $spec_file
-  fi
-
-  if [ $update_submodules = "true" ]; then
-    echo_color "\nUpdating submodules"
-    update_submodules
-  fi
-
-  if [ $apply_patches = "true" ]; then
-    echo_color "\nApplying patches"
-    apply_patches
   fi
 fi
 
