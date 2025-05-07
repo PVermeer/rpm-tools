@@ -40,11 +40,11 @@ usage() {
 
       [ update ] Update the RPM spec file to latest commit(s)
         [ --update-submodules ] Update / Add submodules
-        [ --apply-patches ] Apply patches to submodules
+          [ --apply-patches ] Apply patches to submodules
 
       [ update-submodules ] Update / Add submodules referenced in the spec file
         [ --apply-patches ] Apply patches to submodules
-  
+
         Requires the spec file to have the following %global vars:
           [ %global repository<number> ] Url to repo
           [ %global commit<number> ] The latest commit on which the rpm was built
