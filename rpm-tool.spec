@@ -14,7 +14,7 @@
 %global source2 rpm-tools_copr_test_source
 %global sourcerepo2 https://github.com/pvermeer/rpm-tools
 %global branch2 copr_test_source
-%global commit2 d0af3e2e71d00c2cc445de257b142dd70f881d36
+%global commit2 d830deccb31b8b06bd6d0679cfdc588f8c4f1714
 %global versioncommit2 %(echo -n %{commit2} | head -c 8)
 
 # Own copr repo
@@ -23,7 +23,7 @@
 
 Name: rpm-tool
 Version: 0.0.1
-Release: 2.%{versioncommit}.%{versioncommit2}%{?dist}
+Release: 3.%{versioncommit}.%{versioncommit2}%{?dist}
 License: GPL-3.0 license
 Summary: RPM build to test the rpm-tools.
 Url: %{coprrepo}
