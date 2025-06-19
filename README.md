@@ -1,2 +1,2 @@
 # rpm-tools
-Docker image with some custom rpm build tools
+RPM build- and copr tools to simplify and manage auto builds
