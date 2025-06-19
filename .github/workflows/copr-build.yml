@@ -79,6 +79,8 @@ jobs:
           cd repo
           git config --local user.email "action@github.com"
           git config --local user.name "CI"
+          git --no-pager diff
+          echo ""
           git commit -a -m "build(github-actions): automated update [skip ci]"
           git push
 

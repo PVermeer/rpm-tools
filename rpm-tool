@@ -68,8 +68,8 @@ if [ $update = "true" ]; then
   update_spec_repos $spec_file
 
   if [ "$RPM_SPEC_UPDATE" = "true" ]; then
-    echo_color "\nNew spec file:"
-    cat $spec_file
+    echo_color "\nRPM spec file diff:"
+    git --no-pager diff $spec_file
   fi
 fi
 
