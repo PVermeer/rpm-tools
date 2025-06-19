@@ -69,7 +69,7 @@ if [ $update = "true" ]; then
 
   if [ "$RPM_SPEC_UPDATE" = "true" ]; then
     echo_color "\nRPM spec file diff:"
-    git --no-pager diff $spec_file
+    git --no-pager diff --color=always $spec_file
   fi
 fi
 
