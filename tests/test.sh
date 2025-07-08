@@ -113,8 +113,13 @@ copr_status() {
 }
 
 update_submodules() {
-  echo_color "Update submodules"
+  echo_color "Update submodules + apply patches"
   test_command ./rpm-tool update --update-submodules --apply-patches
+}
+
+update_submodules_check_patches() {
+  echo_color "Update submodules + check patches"
+  test_command ./rpm-tool update --update-submodules --check-patches
 }
 
 update_self() {
@@ -132,6 +137,9 @@ remove_submodules
 echo ""
 
 update_submodules
+echo ""
+
+update_submodules_check_patches
 echo ""
 
 build_local

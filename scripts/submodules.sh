@@ -102,6 +102,11 @@ update_submodules() {
 apply_patches() {
   echo "Checking patch files"
 
+  local only_check_arg=""
+  if [ "$check_patches" = "true" ]; then
+    only_check_arg="--check"
+  fi
+
   local submodule_paths
   if [ ! -f ./.gitmodules ]; then
     echo_warning "No submodules in repo"
@@ -124,7 +129,7 @@ apply_patches() {
         echo_color -n "$file"
         echo ":"
 
-        if ! git apply -v $file; then
+        if ! git apply $only_check_arg -v $file; then
           failed="true"
           echo_warning "PATCH FAILED"
         fi

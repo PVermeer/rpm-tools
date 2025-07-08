@@ -81,6 +81,9 @@ if [ $update_submodules = "true" ]; then
   if [ $apply_patches = "true" ]; then
     echo_color "\nApplying patches"
     apply_patches
+  elif [ $check_patches = "true" ]; then
+    echo_color "\nChecking patches"
+    apply_patches
   fi
 fi
 

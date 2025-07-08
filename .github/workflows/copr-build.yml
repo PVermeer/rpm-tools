@@ -62,7 +62,7 @@ jobs:
       - name: Update RPM
         run: |
           cd repo
-          ../rpm-tools/rpm-tool update --update-submodules --disable-self-update
+          ../rpm-tools/rpm-tool update --update-submodules --check-patches --disable-self-update
           source $XDG_RUNTIME_DIR/rpm-tool-vars
           echo "RPM_SPEC_UPDATE=$RPM_SPEC_UPDATE" >> $GITHUB_ENV
 

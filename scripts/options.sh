@@ -15,6 +15,7 @@ copr_project=""
 copr_package=""
 update_submodules="false"
 apply_patches="false"
+check_patches="false"
 without_local="false"
 
 usage() {
@@ -42,9 +43,11 @@ usage() {
       [ update ] Update the RPM spec file to latest commit(s)
         [ --update-submodules ] Update / Add submodules
           [ --apply-patches ] Apply patches to submodules
+          [ --check-patches ] Check if patches are able to apply to submodules
 
       [ update-submodules ] Update / Add submodules referenced in the spec file
         [ --apply-patches ] Apply patches to submodules
+        [ --check-patches ] Check if patches are able to apply to submodules
 
         Requires the spec file to have the following %global vars:
           [ %global repository<number> ] Url to repo
@@ -132,7 +135,7 @@ set_environment() {
 }
 
 set_arguments() {
-  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,without-local,install-deps,update-self,build,update,update-submodules,copr-build,copr-status"
+  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,check-patches,without-local,install-deps,update-self,build,update,update-submodules,copr-build,copr-status"
   local short_arguments=""
 
   local parsed_arguments
@@ -179,6 +182,10 @@ set_arguments() {
       ;;
     --apply-patches)
       apply_patches="true"
+      shift
+      ;;
+    --check-patches)
+      check_patches="true"
       shift
       ;;
     --without-local)
