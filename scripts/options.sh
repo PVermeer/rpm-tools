@@ -25,6 +25,7 @@ usage() {
     [ --disable-self-update ] Disable self updating of this application
 
       [ build ] Build locally
+        [ --without-local ] Build locally but also fetch and clone the COPR repo as it would in COPR
 
       [ copr-build ] Trigger a build on COPR
         [ --copr-webhook URL ] COPR webhook url
