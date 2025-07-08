@@ -135,7 +135,8 @@ set_arguments() {
   local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,without-local,install-deps,update-self,build,update,update-submodules,copr-build,copr-status"
   local short_arguments=""
 
-  local parsed_arguments=$(getopt --options=$short_arguments --longoptions=$long_arguments --name "$0" -- "$@") || exit 1
+  local parsed_arguments
+  parsed_arguments=$(getopt --options=$short_arguments --longoptions=$long_arguments --name "$0" -- "$@") || exit 1
   eval set -- "$parsed_arguments"
 
   while [ -n "$1" ]; do
