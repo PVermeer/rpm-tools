@@ -81,7 +81,7 @@ jobs:
           git config --local user.name "CI"
           git --no-pager diff --color=always
           echo ""
-          git commit -a -m "build(github-actions): automated update [skip ci]"
+          git commit -a -m "build(github-actions): automated update [skip ci]" || true
           git push
 
       - name: Build on COPR
