@@ -51,6 +51,12 @@ get_release_var_from_spec() {
   echo $release_var
 }
 
+get_version_var_from_spec() {
+  local spec_file=$1
+  local version_var=$(grep -E '^Version:\s[0-9]+\.[0-9]+\.[0-9]+' $spec_file)
+  echo $version_var
+}
+
 increment_release_value_on_spec() {
   local spec_file=$1
   local has_release="true"
@@ -232,6 +238,28 @@ update_spec_repos() {
 
   if [ "$RPM_SPEC_UPDATE" = "true" ] || ! has_release_value_on_spec $spec_file; then
     increment_release_value_on_spec $spec_file
+    RPM_SPEC_UPDATE="true"
+  fi
+}
+
+check_for_spec_version_update() {
+  local spec_file
+  local spec_version_var
+  local copr_version_long
+  local spec_version
+  local copr_version
+
+  spec_file=$1
+
+  spec_version_var=$(get_version_var_from_spec $spec_file)
+  spec_version=$(echo $spec_version_var | awk '{ print $2 }')
+
+  copr_version_long=$(get_copr_version) || fail "Could not get COPR version"
+  copr_version=$(echo $copr_version_long | awk -F . '{ print $1"."$2"."$3 }' | awk -F - '{ print $1 }')
+
+  if [ ! "$spec_version" = "$copr_version" ]; then
+    echo_warning -e -n "\nVersion change detected in spec file:"
+    echo " $copr_version -> $spec_version"
     RPM_SPEC_UPDATE="true"
   fi
 }

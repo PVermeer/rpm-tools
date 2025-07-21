@@ -13,20 +13,46 @@ build_on_copr() {
   RPM_COPR_BUILD="true"
 }
 
+get_copr_response() {
+  local response
+  response=$(curl -s -X 'GET' \
+    "https://copr.fedorainfracloud.org/api_3/package/?ownername=$copr_owner&projectname=$copr_project&packagename=$copr_package&with_latest_build=true&with_latest_succeeded_build=false" \
+    -H 'accept: application/json') || return 1
+
+  echo $response
+}
+
 get_copr_status() {
   if [ -z $copr_owner ] || [ -z $copr_project ] || [ -z $copr_package ]; then
     fail_arg "Please provide all COPR information"
   fi
 
-  local response=$(curl -s -X 'GET' \
-    "https://copr.fedorainfracloud.org/api_3/package/?ownername=$copr_owner&projectname=$copr_project&packagename=$copr_package&with_latest_build=true&with_latest_succeeded_build=false" \
-    -H 'accept: application/json')
+  local response=$(get_copr_response) || fail "Could not fetch copr project"
 
-  local build_state="$(echo $response | jq -r '.builds.latest.state')"
+  local build_state="$(echo $response | jq -r -e '.builds.latest.state')" || fail "Could not parse 'build status' on copr project"
   local error="$(echo $response | jq -r '.error')"
 
   if [ "$error" = "null" ]; then
     echo $build_state
+    return 0
+  fi
+
+  echo $error
+  return 1
+}
+
+get_copr_version() {
+  if [ -z $copr_owner ] || [ -z $copr_project ] || [ -z $copr_package ]; then
+    fail_arg "Please provide all COPR information"
+  fi
+
+  local response=$(get_copr_response) || fail "Could not fetch copr project"
+
+  local build_version="$(echo $response | jq -r -e '.builds.latest.source_package.version')" || fail "Could not parse 'copr version' on copr project"
+  local error="$(echo $response | jq -r '.error')"
+
+  if [ "$error" = "null" ]; then
+    echo $build_version
     return 0
   fi
 

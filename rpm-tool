@@ -67,6 +67,10 @@ if [ $update = "true" ]; then
   echo_color "\n=== Update RPM ==="
   update_spec_repos $spec_file
 
+  if [ "$RPM_SPEC_UPDATE" = "false" ]; then
+    check_for_spec_version_update $spec_file
+  fi
+
   if [ "$RPM_SPEC_UPDATE" = "true" ]; then
     echo_color "\nRPM spec file diff:"
     git --no-pager diff --color=always $spec_file
