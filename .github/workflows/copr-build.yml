@@ -23,6 +23,11 @@ on:
         required: true
         type: string
 
+      check_patched_files_script:
+        description: A script to check files after patching
+        required: false
+        type: string
+
     secrets:
       COPR_WEBHOOK:
         description: COPR webhook (SECRET)
@@ -62,9 +67,15 @@ jobs:
       - name: Update RPM
         run: |
           cd repo
-          ../rpm-tools/rpm-tool update --update-submodules --check-patches --disable-self-update
+          ../rpm-tools/rpm-tool update --update-submodules --apply-patches --disable-self-update
           source $XDG_RUNTIME_DIR/rpm-tool-vars
           echo "RPM_SPEC_UPDATE=$RPM_SPEC_UPDATE" >> $GITHUB_ENV
+
+      - name: Check patched files
+        if: ${{ inputs.check_patched_files_script }}
+        run: |
+          cd repo
+          ${{ inputs.check_patched_files_script }}
 
       - name: Check COPR status
         run: |
