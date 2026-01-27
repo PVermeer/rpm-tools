@@ -32,15 +32,13 @@ print_rpm_files() {
 build_rpm() {
   rm -rf ./rpmbuild
 
-  echo_color "Copying sources / patches:"
+  echo_color "Copying source"
   mkdir -p ./rpmbuild/SOURCES
 
   # SOURCE RPM builds do not accept anything in sub directories...
   # So do not use these and just get sources/patches in %prep
   # so repo organisation will be much better
-  cp $spec_file ./rpmbuild/SOURCES/ &>/dev/null || true
-  cp -r ./sources ./rpmbuild/SOURCES/ &>/dev/null || true
-  cp -r ./patches ./rpmbuild/SOURCES/ &>/dev/null || true
+  cp -r ./ ./rpmbuild/SOURCES/ &>/dev/null || true
 
   if [ "$(ls ./rpmbuild/SOURCES)" ]; then
     find ./rpmbuild/SOURCES -maxdepth 2 -type f

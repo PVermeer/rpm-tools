@@ -79,14 +79,14 @@ cd %{workdir}
 
 %build
 
+%check
+
 %install
 mkdir -p %{buildroot}/etc/modprobe.d
 mkdir -p %{buildroot}/lib/firmware
 
 install %{coprdir}/sources/source1.source %{buildroot}/lib/firmware
 install %{coprdir}/sources/source2.source %{buildroot}/etc/modprobe.d
-
-%check
 
 %post
 echo "POST SCRIPT HERE"
