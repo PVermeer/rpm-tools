@@ -2,7 +2,7 @@ FROM fedora:latest
 
 RUN sudo dnf update -y
 RUN sudo dnf install -y git dnf-plugins-core
-RUN sudo dnf install -y rpmdevtools rpmlint jq curl
+RUN sudo dnf install -y rpmdevtools rpmlint jq curl shellcheck
 
 # Create the user
 ARG USERNAME=user

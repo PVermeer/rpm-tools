@@ -20,8 +20,10 @@
 		"vscode": {
 			"extensions": [
 				"RVSmartPorting.rpm-spec-ext",
-				"foxundermoon.shell-format",
-				"github.vscode-github-actions"
+				"lumirelle.shell-format-rev",
+				"github.vscode-github-actions",
+				"timonwong.shellcheck",
+				"IronGeek.vscode-env"
 			]
 		}
 	},
