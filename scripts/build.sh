@@ -40,10 +40,11 @@ build_rpm() {
   # so repo organisation will be much better
   cp -r ./ ./rpmbuild/SOURCES/ &>/dev/null || true
 
-  if [ "$(ls ./rpmbuild/SOURCES)" ]; then
-    find ./rpmbuild/SOURCES -maxdepth 2 -type f
+  sources_list=$(ls ./rpmbuild/SOURCES)
+  if [ "$sources_list" ]; then
+    echo "$sources_list"
   else
-    echo "No source / patch files"
+    echo "No source files"
   fi
 
   echo_color "\nRPM Lint"
