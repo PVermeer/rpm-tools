@@ -1,5 +1,7 @@
 #!/bin/bash
 
+script_name=$(basename "$0")
+
 spec_file=""
 install_deps="false"
 disable_self_update="false"
@@ -75,7 +77,7 @@ usage() {
 }
 
 fail_arg() {
-  echo_error "\n$@"
+  echo_error "\n$*"
   usage
   echo ""
   exit 1
@@ -112,6 +114,7 @@ set_environment() {
   # Override global options with .env file
   if [ -f "./.env" ]; then
     echo -e "Found environment file"
+    # shellcheck disable=SC1091
     source "./.env"
   fi
 
@@ -139,7 +142,7 @@ set_arguments() {
   local short_arguments=""
 
   local parsed_arguments
-  parsed_arguments=$(getopt --options=$short_arguments --longoptions=$long_arguments --name "$0" -- "$@") || exit 1
+  parsed_arguments=$(getopt --options="$short_arguments" --longoptions=$long_arguments --name "$0" -- "$@") || exit 1
   eval set -- "$parsed_arguments"
 
   while [ -n "$1" ]; do
@@ -149,23 +152,23 @@ set_arguments() {
       exit 0
       ;;
     --disable-self-update)
-      disable_self_update="true"
+      export disable_self_update="true"
       shift
       ;;
     --spec-file)
-      spec_file="$2"
+      export spec_file="$2"
       shift 2
       ;;
     --copr-webhook)
-      copr_webhook="$2"
+      export copr_webhook="$2"
       shift 2
       ;;
     --copr-owner)
-      copr_owner="$2"
+      export copr_owner="$2"
       shift 2
       ;;
     --copr-project)
-      copr_project="$2"
+      export copr_project="$2"
       shift 2
       ;;
     --copr-package)
@@ -173,51 +176,51 @@ set_arguments() {
       shift 2
       ;;
     --copr-watch)
-      copr_watch="true"
+      export copr_watch="true"
       shift
       ;;
     --update-submodules)
-      update_submodules="true"
+      export update_submodules="true"
       shift
       ;;
     --apply-patches)
-      apply_patches="true"
+      export apply_patches="true"
       shift
       ;;
     --check-patches)
-      check_patches="true"
+      export check_patches="true"
       shift
       ;;
     --without-local)
-      without_local="true"
+      export without_local="true"
       shift
       ;;
     build)
-      build="true"
+      export build="true"
       shift
       ;;
     update)
-      update="true"
+      export update="true"
       shift
       ;;
     update-submodules)
-      update_submodules="true"
+      export update_submodules="true"
       shift
       ;;
     copr-build)
-      copr_build="true"
+      export copr_build="true"
       shift
       ;;
     copr-status)
-      copr_status="true"
+      export copr_status="true"
       shift
       ;;
     update-self)
-      update_self="true"
+      export update_self="true"
       shift
       ;;
     install-deps)
-      install_deps="true"
+      export install_deps="true"
       shift
       ;;
     --)
