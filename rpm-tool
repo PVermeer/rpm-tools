@@ -3,10 +3,9 @@
 set -e
 set -o pipefail
 
-script_name=$(basename "$0")
 script_dir=$(dirname "$0")
 
-source $script_dir/scripts/bash-color.sh
+source "${script_dir}/scripts/bash-color.sh"
 
 export RPM_LOCAL_BUILD="false"
 export RPM_COPR_BUILD="false"
@@ -18,9 +17,9 @@ trap export_variables_to_tmp EXIT
 # Script options
 echo_color "\n=== Setting up options ==="
 
-source $script_dir/scripts/options.sh
-set_environment $@
-set_arguments $@
+source "${script_dir}/scripts/options.sh"
+set_environment "$@"
+set_arguments "$@"
 print_options
 
 # Required options
@@ -28,12 +27,12 @@ if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false
   fail_arg "Please provide a 'build / status / update' option"
 fi
 
-source $script_dir/scripts/utils.sh
-source $script_dir/scripts/build.sh
-source $script_dir/scripts/rpm-spec.sh
-source $script_dir/scripts/submodules.sh
-source $script_dir/scripts/copr.sh
-source $script_dir/scripts/updater.sh
+source "${script_dir}/scripts/utils.sh"
+source "${script_dir}/scripts/build.sh"
+source "${script_dir}/scripts/rpm-spec.sh"
+source "${script_dir}/scripts/submodules.sh"
+source "${script_dir}/scripts/copr.sh"
+source "${script_dir}/scripts/updater.sh"
 
 # Dependencies
 echo_color "\n=== Checking dependencies ==="
@@ -43,7 +42,7 @@ if [ "$install_deps" = "true" ]; then
   exit 0
 fi
 
-if [ -z $spec_file ]; then
+if [ -z "$spec_file" ]; then
   fail_arg "No spec-file provided"
 fi
 
@@ -57,7 +56,7 @@ else
     # Don't need to reload if only set to update and do nothing
     if [ "$update_self" = "false" ]; then
       echo_warning -e "\n========== LOADING UPDATE ==========\n"
-      exec $script_dir/rpm-tool $@ --disable-self-update
+      exec "${script_dir}/rpm-tool" "$@" --disable-self-update
       exit 0
     fi
   fi
@@ -66,15 +65,15 @@ fi
 # === UPDATE RPM ===
 if [ $update = "true" ]; then
   echo_color "\n=== Update RPM ==="
-  update_spec_repos $spec_file
+  update_spec_repos "$spec_file"
 
   if [ "$RPM_SPEC_UPDATE" = "false" ]; then
-    check_for_spec_version_update $spec_file
+    check_for_spec_version_update "$spec_file"
   fi
 
   if [ "$RPM_SPEC_UPDATE" = "true" ]; then
     echo_color "\nRPM spec file diff:"
-    git --no-pager diff --color=always $spec_file
+    git --no-pager diff --color=always "$spec_file"
   fi
 fi
 
@@ -108,7 +107,7 @@ if [ $copr_build = "true" ]; then
 
   if [ $copr_watch = "true" ]; then
 
-    if [ -z $copr_owner ] || [ -z $copr_project ] || [ -z $copr_package ]; then
+    if [ -z "$copr_owner" ] || [ -z "$copr_project" ] || [ -z "$copr_package" ]; then
       fail_arg "Please provide all copr information for --copr-watch"
     fi
 
