@@ -7,13 +7,6 @@ script_name=$(basename "$0")
 script_dir=$(dirname "$0")
 
 source $script_dir/scripts/bash-color.sh
-source $script_dir/scripts/utils.sh
-source $script_dir/scripts/options.sh
-source $script_dir/scripts/build.sh
-source $script_dir/scripts/rpm-spec.sh
-source $script_dir/scripts/submodules.sh
-source $script_dir/scripts/copr.sh
-source $script_dir/scripts/updater.sh
 
 export RPM_LOCAL_BUILD="false"
 export RPM_COPR_BUILD="false"
@@ -25,6 +18,7 @@ trap export_variables_to_tmp EXIT
 # Script options
 echo_color "\n=== Setting up options ==="
 
+source $script_dir/scripts/options.sh
 set_environment $@
 set_arguments $@
 print_options
@@ -33,6 +27,13 @@ print_options
 if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ] && [ "$update_self" = "false" ] && [ "$install_deps" = "false" ] && [ "$update_submodules" = "false" ]; then
   fail_arg "Please provide a 'build / status / update' option"
 fi
+
+source $script_dir/scripts/utils.sh
+source $script_dir/scripts/build.sh
+source $script_dir/scripts/rpm-spec.sh
+source $script_dir/scripts/submodules.sh
+source $script_dir/scripts/copr.sh
+source $script_dir/scripts/updater.sh
 
 # Dependencies
 echo_color "\n=== Checking dependencies ==="
