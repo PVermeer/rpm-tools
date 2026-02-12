@@ -6,6 +6,7 @@ set -o pipefail
 script_dir=$(dirname "$0")
 
 source "${script_dir}/scripts/bash-color.sh"
+source "${script_dir}/scripts/utils.sh"
 
 export RPM_LOCAL_BUILD="false"
 export RPM_COPR_BUILD="false"
@@ -27,7 +28,6 @@ if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false
   fail_arg "Please provide a 'build / status / update' option"
 fi
 
-source "${script_dir}/scripts/utils.sh"
 source "${script_dir}/scripts/build.sh"
 source "${script_dir}/scripts/rpm-spec.sh"
 source "${script_dir}/scripts/submodules.sh"
