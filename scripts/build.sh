@@ -1,5 +1,18 @@
 #!/bin/bash
 
+if [ -z "$without_local" ]; then
+  echo_error "without_local = undefined"
+  exit 1
+fi
+if [ -z "$spec_file" ]; then
+  echo_error "spec_file = undefined"
+  exit 1
+fi
+if [ -z "$RPM_LOCAL_BUILD" ]; then
+  echo_error "RPM_LOCAL_BUILD = undefined"
+  exit 1
+fi
+
 print_rpm_files() {
   echo_color "\nRPM file contents:"
 
@@ -9,10 +22,10 @@ print_rpm_files() {
     echo " $file"
 
     echo_color "files:"
-    rpm -qvlp $file
+    rpm -qvlp "$file"
 
     echo_color "scripts:"
-    rpm -qp --scripts $file
+    rpm -qp --scripts "$file"
   done
 
   echo ""
@@ -22,10 +35,10 @@ print_rpm_files() {
     echo " $file"
 
     echo_color "files:"
-    rpm -qvlp $file
+    rpm -qvlp "$file"
 
     echo_color "scripts:"
-    rpm -qp --scripts $file
+    rpm -qp --scripts "$file"
   done
 }
 
@@ -48,15 +61,15 @@ build_rpm() {
   fi
 
   echo_color "\nRPM Lint"
-  rpmlint ./$spec_file
+  rpmlint "./${spec_file}"
 
   echo_color "\nRPM Build"
 
   if [ "$without_local" = "true" ]; then
     # For debugging COPR in local builds
-    run_debug rpmbuild --define "_topdir $PWD/rpmbuild" -ba --noclean ./$spec_file
+    run_debug rpmbuild --define "_topdir $PWD/rpmbuild" -ba --noclean "./${spec_file}"
   else
-    run_debug rpmbuild --define "_topdir $PWD/rpmbuild" -ba --noclean --with local ./$spec_file
+    run_debug rpmbuild --define "_topdir $PWD/rpmbuild" -ba --noclean --with local "./${spec_file}"
   fi
 
   RPM_LOCAL_BUILD="true"
