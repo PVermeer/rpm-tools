@@ -217,6 +217,7 @@ update_spec_repos() {
     branch=$(find_matching_branch "$global_spec_vars" "$repo_match_number")
     current_commit=$(find_matching_commit "$global_spec_vars" "$repo_match_number")
     new_commit=$(get_new_commit "$repo_value" "$branch" || fail "Unable to get git ref")
+    if [ -z "$current_commit" ]; then fail "Unable to get current commit"; fi
     if [ -z "$new_commit" ]; then fail "Unable to get latest commit"; fi
 
     echo ""
