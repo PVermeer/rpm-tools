@@ -129,8 +129,34 @@ update_self() {
   enable_self_update="false"
 }
 
+release() {
+  echo_color "Create a release in git and update the RPM spec"
+  local test_spec
+  local test_spec_version
+  local test_spec_tag
+
+  test_spec=./tests/rpm-tool-tag-test.spec
+
+  cp ./rpm-tool-tag.spec $test_spec
+  test_command ./rpm-tool release --spec-file="$test_spec" --no-push --new-version="1.2.3" || return 1
+
+  test_spec_version=$(grep "Version: " $test_spec)
+  test_spec_tag=$(grep "%global tag v" $test_spec)
+
+  echo "Version in spec file: $test_spec_version"
+  echo "Tag in spec file: $test_spec_tag"
+
+  # Cleanup
+  git tag -d "v1.2.3" || return 1
+  git reset --soft HEAD~1 || return 1
+  rm $test_spec
+}
+
 # Run tests
 update_self
+echo ""
+
+release
 echo ""
 
 remove_submodules

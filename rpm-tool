@@ -24,8 +24,8 @@ set_arguments "$@"
 print_options
 
 # Required options
-if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ] && [ "$update_self" = "false" ] && [ "$install_deps" = "false" ] && [ "$update_submodules" = "false" ]; then
-  fail_arg "Please provide a 'build / status / update' option"
+if [ "$build" = "false" ] && [ "$update" = "false" ] && [ "$copr_build" = "false" ] && [ "$copr_status" = "false" ] && [ "$update_self" = "false" ] && [ "$install_deps" = "false" ] && [ "$update_submodules" = "false" ] && [ "$release" = "false" ]; then
+  fail_arg "Please provide a 'build / status / update / release' option"
 fi
 
 source "${script_dir}/scripts/build.sh"
@@ -33,6 +33,7 @@ source "${script_dir}/scripts/rpm-spec.sh"
 source "${script_dir}/scripts/submodules.sh"
 source "${script_dir}/scripts/copr.sh"
 source "${script_dir}/scripts/updater.sh"
+source "${script_dir}/scripts/release.sh"
 
 # Dependencies
 echo_color "\n=== Checking dependencies ==="
@@ -75,6 +76,15 @@ if [ $update = "true" ]; then
     echo_color "\nRPM spec file diff:"
     git --no-pager diff --color=always "$spec_file"
   fi
+fi
+
+# === Release ===
+if [ "$release" = "true" ]; then
+
+  echo_color "\n=== Create release ==="
+
+  release
+  echo_success "Created a new release"
 fi
 
 # === UPDATE SUBMODULES ===

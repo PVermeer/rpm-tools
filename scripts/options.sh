@@ -2,23 +2,26 @@
 
 script_name=$(basename "$0")
 
-spec_file=""
-install_deps="false"
-disable_self_update="false"
-copr_webhook=""
-build="false"
-update="false"
-update_self="false"
-copr_build="false"
-copr_watch="false"
-copr_status="false"
-copr_owner=""
-copr_project=""
-copr_package=""
-update_submodules="false"
-apply_patches="false"
-check_patches="false"
-without_local="false"
+export spec_file=""
+export install_deps="false"
+export disable_self_update="false"
+export copr_webhook=""
+export build="false"
+export update="false"
+export release="false"
+export update_self="false"
+export copr_build="false"
+export copr_watch="false"
+export copr_status="false"
+export copr_owner=""
+export copr_project=""
+export copr_package=""
+export update_submodules="false"
+export apply_patches="false"
+export check_patches="false"
+export without_local="false"
+export new_version=""
+export no_push="false"
 
 usage() {
   echo -e "$script_name usage:
@@ -42,10 +45,19 @@ usage() {
         [ --copr-project PROJECT ] COPR project
         [ --copr-package PACKAGE NAME ] COPR package name
 
-      [ update ] Update the RPM spec file to latest commit(s)
+      [ update ] Update the external repo commits in the RPM spec file to latest commit(s)
+        Use this for external repo builds
         [ --update-submodules ] Update / Add submodules
           [ --apply-patches ] Apply patches to submodules
           [ --check-patches ] Check if patches are able to apply to submodules
+
+      [ release ] Create a release in git and update the RPM spec file version and git tag
+        Use this for owned repos
+        [ --new-version VERSION ] New semantic version (e.g. 1.2.3)
+        [ --no-push ] Disable push to remote
+
+        Requires the spec file to have the following %gloval vars:
+          [ %global tag v<semantic version> ]
 
       [ update-submodules ] Update / Add submodules referenced in the spec file
         [ --apply-patches ] Apply patches to submodules
@@ -138,7 +150,7 @@ set_environment() {
 }
 
 set_arguments() {
-  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,check-patches,without-local,install-deps,update-self,build,update,update-submodules,copr-build,copr-status"
+  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,check-patches,without-local,new-version:,no-push,install-deps,update-self,build,update,release,update-submodules,copr-build,copr-status"
   local short_arguments=""
 
   local parsed_arguments
@@ -152,23 +164,23 @@ set_arguments() {
       exit 0
       ;;
     --disable-self-update)
-      export disable_self_update="true"
+      disable_self_update="true"
       shift
       ;;
     --spec-file)
-      export spec_file="$2"
+      spec_file="$2"
       shift 2
       ;;
     --copr-webhook)
-      export copr_webhook="$2"
+      copr_webhook="$2"
       shift 2
       ;;
     --copr-owner)
-      export copr_owner="$2"
+      copr_owner="$2"
       shift 2
       ;;
     --copr-project)
-      export copr_project="$2"
+      copr_project="$2"
       shift 2
       ;;
     --copr-package)
@@ -176,51 +188,63 @@ set_arguments() {
       shift 2
       ;;
     --copr-watch)
-      export copr_watch="true"
+      copr_watch="true"
       shift
       ;;
     --update-submodules)
-      export update_submodules="true"
+      update_submodules="true"
       shift
       ;;
     --apply-patches)
-      export apply_patches="true"
+      apply_patches="true"
       shift
       ;;
     --check-patches)
-      export check_patches="true"
+      check_patches="true"
       shift
       ;;
     --without-local)
-      export without_local="true"
+      without_local="true"
+      shift
+      ;;
+    --new-version)
+      new_version="$2"
+      shift 2
+      ;;
+    --no-push)
+      no_push="true"
       shift
       ;;
     build)
-      export build="true"
+      build="true"
       shift
       ;;
     update)
-      export update="true"
+      update="true"
+      shift
+      ;;
+    release)
+      release="true"
       shift
       ;;
     update-submodules)
-      export update_submodules="true"
+      update_submodules="true"
       shift
       ;;
     copr-build)
-      export copr_build="true"
+      copr_build="true"
       shift
       ;;
     copr-status)
-      export copr_status="true"
+      copr_status="true"
       shift
       ;;
     update-self)
-      export update_self="true"
+      update_self="true"
       shift
       ;;
     install-deps)
-      export install_deps="true"
+      install_deps="true"
       shift
       ;;
     --)
