@@ -8,8 +8,9 @@ enable_copr_build="false"
 set_arguments() {
   local long_arguments="enable-copr-build,verbose"
   local short_arguments="v"
+  local parsed_arguments
 
-  local parsed_arguments=$(getopt --options=$short_arguments --longoptions=$long_arguments --name "$0" -- "$@") || exit 1
+  parsed_arguments=$(getopt --options=$short_arguments --longoptions=$long_arguments --name "$0" -- "$@") || exit 1
   eval set -- "$parsed_arguments"
 
   while [ -n "$1" ]; do
@@ -33,6 +34,7 @@ set_arguments() {
     esac
   done
 }
+# shellcheck disable=SC2068
 set_arguments $@
 
 failed_commands=()
@@ -40,18 +42,19 @@ explicit_verbose="false"
 enable_self_update="false"
 
 test_command() {
-  local command="$@"
+  local command="$*"
 
   if [ "$enable_self_update" = "false" ]; then
     command+=" --disable-self-update"
   fi
 
   if [ "$verbose" = "true" ] || [ "$explicit_verbose" = "true" ]; then
-    run_debug $command
+    run_debug "$command"
   else
     $command &>/dev/null
   fi
 
+  # shellcheck disable=SC2181
   if [ $? -ne 0 ]; then
     if [ "$explicit_verbose" = "false" ]; then
       failed_commands+=("$command")
@@ -67,8 +70,8 @@ test_command() {
 run_failed_commands() {
   local command
   for command in "${failed_commands[@]}"; do
-    echo_error $command
-    run_debug $command
+    echo_error "$command"
+    run_debug "$command"
     echo ""
   done
 }
@@ -78,10 +81,10 @@ remove_submodules() {
 
   remove() {
     local submodule_dir="$1"
-    if [ -d $submodule_dir ]; then
-      git submodule deinit -f $submodule_dir
-      git rm -f $submodule_dir
-      rm -rf .git/modules/$submodule_dir
+    if [ -d "$submodule_dir" ]; then
+      git submodule deinit -f "$submodule_dir"
+      git rm -f "$submodule_dir"
+      rm -rf .git/modules/"$submodule_dir"
     fi
   }
 
