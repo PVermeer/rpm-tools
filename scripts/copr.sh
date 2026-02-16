@@ -1,14 +1,23 @@
 #!/bin/bash
 
+if [ -z "$RPM_COPR_BUILD" ]; then
+  echo_error "RPM_COPR_BUILD = undefined"
+  exit 1
+fi
+if [ -z "$COPR_STATUS" ]; then
+  echo_error "COPR_STATUS = undefined"
+  exit 1
+fi
+
 build_on_copr() {
-  if [ -z $copr_webhook ]; then
+  if [ -z "$copr_webhook" ]; then
     fail_arg "Please provide the COPR webhook --copr-webhook"
   fi
   git_check_for_changes
 
   echo_color "\nSending build request to Copr"
 
-  curl --fail-with-body --no-progress-meter -X POST $copr_webhook || fail "The COPR webhook failed"
+  curl --fail-with-body --no-progress-meter -X POST "$copr_webhook" || fail "The COPR webhook failed"
 
   RPM_COPR_BUILD="true"
 }
@@ -19,44 +28,50 @@ get_copr_response() {
     "https://copr.fedorainfracloud.org/api_3/package/?ownername=$copr_owner&projectname=$copr_project&packagename=$copr_package&with_latest_build=true&with_latest_succeeded_build=false" \
     -H 'accept: application/json') || return 1
 
-  echo $response
+  echo "$response"
 }
 
 get_copr_status() {
-  if [ -z $copr_owner ] || [ -z $copr_project ] || [ -z $copr_package ]; then
+  if [ -z "$copr_owner" ] || [ -z "$copr_project" ] || [ -z "$copr_package" ]; then
     fail_arg "Please provide all COPR information"
   fi
 
-  local response=$(get_copr_response) || fail "Could not fetch copr project"
+  local response
+  local build_state
+  local error
 
-  local build_state="$(echo $response | jq -r -e '.builds.latest.state')" || fail "Could not parse 'build status' on copr project"
-  local error="$(echo $response | jq -r '.error')"
+  response=$(get_copr_response) || fail "Could not fetch copr project"
+  build_state="$(echo "$response" | jq -r -e '.builds.latest.state')" || fail "Could not parse 'build status' on copr project"
+  error="$(echo "$response" | jq -r '.error')"
 
   if [ "$error" = "null" ]; then
-    echo $build_state
+    echo "$build_state"
     return 0
   fi
 
-  echo $error
+  echo "$error"
   return 1
 }
 
 get_copr_version() {
-  if [ -z $copr_owner ] || [ -z $copr_project ] || [ -z $copr_package ]; then
+  if [ -z "$copr_owner" ] || [ -z "$copr_project" ] || [ -z "$copr_package" ]; then
     fail_arg "Please provide all COPR information"
   fi
 
-  local response=$(get_copr_response) || fail "Could not fetch copr project"
-
-  local build_version="$(echo $response | jq -r -e '.builds.latest.source_package.version')" || fail "Could not parse 'copr version' on copr project"
-  local error="$(echo $response | jq -r '.error')"
+  local response
+  local build_version
+  local error
+  
+  response=$(get_copr_response) || fail "Could not fetch copr project"
+  build_version="$(echo "$response" | jq -r -e '.builds.latest.source_package.version')" || fail "Could not parse 'copr version' on copr project"
+  error="$(echo "$response" | jq -r '.error')"
 
   if [ "$error" = "null" ]; then
-    echo $build_version
+    echo "$build_version"
     return 0
   fi
 
-  echo $error
+  echo "$error"
   return 1
 }
 
@@ -75,17 +90,17 @@ copr_watch() {
     COPR_STATUS="$build_state"
 
     if [ "$build_state" = "succeeded" ]; then
-      echo "Copr build status: $(echo_success $build_state) on $(date)"
+      echo "Copr build status: $(echo_success "$build_state") on $(date)"
       break
     elif [ "$build_state" = "failed" ]; then
-      echo "Copr build status: $(echo_error $build_state) on $(date)"
+      echo "Copr build status: $(echo_error "$build_state") on $(date)"
       exit 1
     elif [ "$build_state" = "null" ] || [ -z "$build_state" ]; then
       fail "Could not get build state from COPR on $(date)"
     elif [ "$build_state" = "canceled" ] || [ -z "$build_state" ]; then
       fail "Copr build has been canceled on $(date)"
     else
-      echo "Copr build status: $(echo_warning $build_state) on $(date)"
+      echo "Copr build status: $(echo_warning "$build_state") on $(date)"
       sleep 10
     fi
   done
