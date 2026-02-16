@@ -1,5 +1,14 @@
 #!/bin/bash
 
+if [ -z "$spec_file" ]; then
+  echo_error "spec_file = undefined"
+  exit 1
+fi
+if [ -z "$check_patches" ]; then
+  echo_error "check_patches = undefined"
+  exit 1
+fi
+
 get_submodule_path_from_url() {
   local url=$1
   local config_path
@@ -11,7 +20,7 @@ get_submodule_path_from_url() {
 
   path=$(git config --file .gitmodules "$config_path.path") || return 1
 
-  echo $path
+  echo "$path"
 }
 
 get_git_submodule_paths() {
@@ -27,7 +36,7 @@ get_git_submodule_paths() {
     submodule_paths+=" $path"
   done
 
-  echo $submodule_paths
+  echo "$submodule_paths"
 }
 
 add_submodule() {
@@ -36,14 +45,14 @@ add_submodule() {
 
   echo -en "Adding new submodule: "
   echo_color -e "$repo"
-  git submodule add $repo
+  git submodule add "$repo"
 }
 
 update_submodules() {
   echo "Checking out sources as submodules"
 
   local global_spec_vars
-  global_spec_vars=$(get_global_vars_from_spec $spec_file)
+  global_spec_vars=$(get_global_vars_from_spec "$spec_file")
 
   local keyValue
   for keyValue in $global_spec_vars; do
@@ -51,8 +60,8 @@ update_submodules() {
     local value
     local repo
 
-    key=$(get_key $keyValue)
-    value=$(get_value $keyValue)
+    key=$(get_key "$keyValue")
+    value=$(get_value "$keyValue")
 
     if [[ ! $key = sourcerepo* ]]; then continue; fi
     repo=$value
@@ -60,7 +69,7 @@ update_submodules() {
 
     # Add repo if not in .gitmodules
     if [ ! -f ./.gitmodules ]; then
-      add_submodule $repo
+      add_submodule "$repo"
     fi
 
     local submodule_path
@@ -68,20 +77,20 @@ update_submodules() {
     local commit
     local branch
 
-    submodule_path=$(get_submodule_path_from_url $repo || echo "")
+    submodule_path=$(get_submodule_path_from_url "$repo" || echo "")
 
     if [ -z "$submodule_path" ] || [ ! -d "$submodule_path" ]; then
-      add_submodule $repo
-      submodule_path=$(get_submodule_path_from_url $repo || echo "")
+      add_submodule "$repo"
+      submodule_path=$(get_submodule_path_from_url "$repo" || echo "")
     fi
 
     if [ -z "$submodule_path" ]; then
       fail "Could not add submodule"
     fi
 
-    repo_match_number=$(get_match_number $key)
-    commit=$(find_matching_commit "$global_spec_vars" $repo_match_number)
-    branch=$(find_matching_branch "$global_spec_vars" $repo_match_number)
+    repo_match_number=$(get_match_number "$key")
+    commit=$(find_matching_commit "$global_spec_vars" "$repo_match_number")
+    branch=$(find_matching_branch "$global_spec_vars" "$repo_match_number")
 
     if [ -z "$commit" ]; then
       fail "Could not get commit for reset"
@@ -89,11 +98,11 @@ update_submodules() {
 
     echo -en "Resetting submodule: "
     echo_color -e "$repo"
-    cd "./$submodule_path"
-    if [ -n $branch ] && [ "$branch" != "HEAD" ]; then
-      git switch $branch
+    cd "./$submodule_path" || exit
+    if [ -n "$branch" ] && [ "$branch" != "HEAD" ]; then
+      git switch "$branch"
     fi
-    git reset --hard $commit
+    git reset --hard "$commit"
     git submodule update --init --recursive --checkout --force
     cd ..
   done
@@ -112,24 +121,24 @@ apply_patches() {
     echo_warning "No submodules in repo"
     return
   fi
-  submodule_paths=$(get_source_repo_paths_from_spec $spec_file)
+  submodule_paths=$(get_source_repo_paths_from_spec "$spec_file")
 
   local failed="false"
   local path
   for path in $submodule_paths; do
     local patch_files="../patches/$path/*.patch"
 
-    cd "./$path"
+    cd "./$path" || fail "Failed to cd into $path"
 
     # One-by-one so the filename of the patch is printed
-    if ls $patch_files &>/dev/null; then
+    if ls "$patch_files" &>/dev/null; then
       local file
-      for file in ../patches/$path/*.patch; do
+      for file in ../patches/"$path"/*.patch; do
         echo -n -e "\nPatch "
         echo_color -n "$file"
         echo ":"
 
-        if ! git apply $only_check_arg -v $file; then
+        if ! git apply $only_check_arg -v "$file"; then
           failed="true"
           echo_warning "PATCH FAILED"
         fi
