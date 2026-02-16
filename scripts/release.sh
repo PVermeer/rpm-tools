@@ -112,7 +112,7 @@ update_version_in_cargo() {
   local cargo_file_default="./Cargo.toml"
   local cargo_file=${cargo_file:-$cargo_file_default}
 
-  if [ -f "$cargo_file" ] && which cargo; then
+  if [ -f "$cargo_file" ] && which cargo &>/dev/null; then
     echo "Updating version in ${cargo_file}"
   else
     return 0
