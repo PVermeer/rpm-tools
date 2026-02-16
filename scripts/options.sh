@@ -22,6 +22,7 @@ export check_patches="false"
 export without_local="false"
 export new_version=""
 export no_push="false"
+export cargo_file=""
 
 usage() {
   echo -e "$script_name usage:
@@ -51,10 +52,11 @@ usage() {
           [ --apply-patches ] Apply patches to submodules
           [ --check-patches ] Check if patches are able to apply to submodules
 
-      [ release ] Create a release in git and update the RPM spec file version and git tag
+      [ release ] Create a release in git and update the RPM- and (optional) Cargo version
         Use this for owned repos
         [ --new-version VERSION ] New semantic version (e.g. 1.2.3)
         [ --no-push ] Disable push to remote
+        [ --cargo-file ] Specify path of Cargo.toml (default is repo root)
 
         Requires the spec file to have the following %gloval vars:
           [ %global tag v<semantic version> ]
@@ -150,7 +152,7 @@ set_environment() {
 }
 
 set_arguments() {
-  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,check-patches,without-local,new-version:,no-push,install-deps,update-self,build,update,release,update-submodules,copr-build,copr-status"
+  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,check-patches,without-local,new-version:,no-push,cargo-file:,install-deps,update-self,build,update,release,update-submodules,copr-build,copr-status"
   local short_arguments=""
 
   local parsed_arguments
@@ -214,6 +216,10 @@ set_arguments() {
     --no-push)
       no_push="true"
       shift
+      ;;
+    --cargo-file)
+      cargo_file="$2"
+      shift 2
       ;;
     build)
       build="true"

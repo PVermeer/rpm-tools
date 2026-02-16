@@ -16,6 +16,8 @@ fi
 RPM_SPEC_VERSION_KEY="Version"
 RPM_SPEC_TAG_KEY="%global tag"
 
+CARGO_VERSION_KEY="version"
+
 get_current_version() {
   local spec_file=$1
   local current_version_line
@@ -105,6 +107,35 @@ update_tag_in_spec_file() {
   }
 }
 
+update_version_in_cargo() {
+  local new_version=$1
+  local cargo_file_default="./Cargo.toml"
+  local cargo_file=${cargo_file:-$cargo_file_default}
+
+  if [ -f "$cargo_file" ] && which cargo; then
+    echo "Updating version in ${cargo_file}"
+  else
+    return 0
+  fi
+
+  local current_version_line
+
+  current_version_line=$(grep --max-count=1 "${CARGO_VERSION_KEY} = " "$cargo_file") || {
+    echo_error "Failed to get version key in ${cargo_file}"
+    return 1
+  }
+
+  sed -i "0,/${current_version_line}/s/${current_version_line}/${CARGO_VERSION_KEY} = \"${new_version}\"/" "$cargo_file" || {
+    echo_error "Failed to update version in ${cargo_file}"
+    return 1
+  }
+
+  cargo generate-lockfile --manifest-path "$cargo_file" --offline || {
+    echo_error "Failed to generate a new lockfile from ${cargo_file}"
+    return 1
+  }
+}
+
 create_release_in_git() {
   local new_version=$1
   local new_tag
@@ -142,6 +173,8 @@ release() {
   echo_color -e "Updating spec file"
   update_version_in_spec_file "$spec_file" "$new_release_version"
   update_tag_in_spec_file "$spec_file" "$new_release_version"
+
+  update_version_in_cargo "$new_release_version"
 
   echo_color -e "\nCreating release in git"
   create_release_in_git "$new_release_version"
