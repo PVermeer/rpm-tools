@@ -8,14 +8,13 @@
 	"features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {
 			"installZsh": "false",
-			"username": "user",
+			"username": "vscode",
 			"userUid": "1000",
 			"userGid": "1000",
 			"upgradePackages": "false"
 		}
 	},
-	"postCreateCommand": "sudo dnf update -y",
-	"postStartCommand": "sudo dnf update -y",
+	"postStartCommand": "sudo dnf update -y && (rustup update || (rustup toolchain uninstall stable && rustup toolchain install stable))",
 	"customizations": {
 		"vscode": {
 			"extensions": [
@@ -23,9 +22,10 @@
 				"lumirelle.shell-format-rev",
 				"github.vscode-github-actions",
 				"timonwong.shellcheck",
-				"IronGeek.vscode-env"
+				"IronGeek.vscode-env",
+				"tamasfe.even-better-toml"
 			]
 		}
 	},
-	"remoteUser": "user"
+	"remoteUser": "vscode"
 }
