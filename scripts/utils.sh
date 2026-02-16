@@ -1,7 +1,7 @@
 #!/bin/bash
 
 fail() {
-  echo_error "$@\n"
+  echo_error "$*\n"
   exit 1
 }
 
@@ -17,15 +17,15 @@ export_variables_to_tmp() {
   status_vars+=("UPDATE_SELF=$UPDATE_SELF")
   status_vars+=("COPR_STATUS=$COPR_STATUS")
 
-  touch $status_file
+  touch "$status_file"
   (
     IFS=$'\n'
-    echo "${status_vars[*]}" >$status_file
+    echo "${status_vars[*]}" >"$status_file"
   )
 
   echo ""
   echo_success "Wrote status file > $status_file:"
-  cat $status_file
+  cat "$status_file"
   echo ""
 }
 
