@@ -1,0 +1,10 @@
+[package]
+name = "some-app"
+version = "0.0.0"
+
+# Prevents use of parent Cargo.toml when run from tests
+[workspace]
+members = []
+
+[dependencies]
+static_assertions = { version = "1.1.0" }

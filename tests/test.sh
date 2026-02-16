@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# shellcheck disable=SC1091
 source ./scripts/bash-color.sh
 
 verbose="false"
@@ -61,6 +62,7 @@ test_command() {
     fi
     echo_error -n "Failed"
     echo " $command"
+    return 1
   else
     echo_success -n "Success"
     echo " $command"
@@ -133,26 +135,52 @@ update_self() {
 }
 
 release() {
-  echo_color "Create a release in git and update the RPM spec"
-  local test_spec
+  echo_color "Create a release in git and update the RPM + Cargo"
   local test_spec_version
   local test_spec_tag
 
-  test_spec=./tests/rpm-tool-tag-test.spec
+  local test_spec="./tests/rpm-tool-tag-test.spec"
+  local test_cargo="./tests/Cargo.toml"
+  local test_version="1.2.3"
+  local is_failed="false"
+  local test_cargo_dep="static_assertions"
 
   cp ./rpm-tool-tag.spec $test_spec
-  test_command ./rpm-tool release --spec-file="$test_spec" --no-push --new-version="1.2.3" || return 1
+  cp ./Cargo.toml $test_cargo
+
+  test_command ./rpm-tool release --spec-file="$test_spec" --cargo-file="$test_cargo" --no-push --new-version="$test_version" || return 1
 
   test_spec_version=$(grep "Version: " $test_spec)
   test_spec_tag=$(grep "%global tag v" $test_spec)
+  test_cargo_version=$(grep --max-count=1 "version = " "$test_cargo")
+  test_cargo_dep_version=$(grep --max-count=1 "${test_cargo_dep} = " "$test_cargo")
 
   echo "Version in spec file: $test_spec_version"
   echo "Tag in spec file: $test_spec_tag"
+  echo "Version in Cargo.toml: $test_cargo_version"
+  echo "Dependency version in Cargo.toml: $test_cargo_dep_version"
+
+  # Checks
+  if echo "$test_cargo_version" | grep "0.0.0" &>/dev/null; then
+    echo_error "Failed: Failed to update Cargo version"
+    is_failed="true"
+  fi
+
+  if echo "$test_cargo_dep_version" | grep "$test_version" &>/dev/null; then
+    echo_error "Failed: Cargo dependency version got updated"
+    is_failed="true"
+  fi
 
   # Cleanup
-  git tag -d "v1.2.3" || return 1
-  git reset --soft HEAD~1 || return 1
   rm $test_spec
+  rm $test_cargo
+  rm "./tests/Cargo.lock"
+  git tag -d "v${test_version}" || return 1
+  git reset --soft HEAD~1 || return 1
+
+  if [ "$is_failed" = "true" ]; then
+    return 1
+  fi
 }
 
 # Run tests
