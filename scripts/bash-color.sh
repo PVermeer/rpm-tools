@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Disable shellcheck, this is intended behavior
+# shellcheck disable=SC2124
+# shellcheck disable=SC2086
+
 blue='\033[1;34m'
 teal='\033[1;36m'
 green='\033[1;32m'
@@ -11,7 +15,7 @@ purple='\033[1;35m'
 slate='\033[38:5:67m'
 cyan_dim='\033[2;36m'
 removecolor='\033[0m'
-arrow='➜'
+# arrow='➜'
 themecolor=$purple
 errorcolor=$red
 warningcolor=$yellow
@@ -20,6 +24,9 @@ tracecolor=$cyan_dim
 
 THEME=$(gsettings get org.gnome.desktop.interface accent-color 2>/dev/null || echo "'purple'")
 THEME=${THEME//\'/}
+
+switches=""
+arguments=""
 
 case $THEME in
 "blue")
@@ -79,7 +86,7 @@ parse_arguments() {
       ;;
     esac
   done
-  arguments="$@"
+  arguments=$*
 
   # Some shells (github actions!) dont pass the color
   # to the next line when provided before `\n`
@@ -144,7 +151,7 @@ echo_debug() {
 run_debug() {
   local BASH_XTRACEFD=7
   local command="${@@Q}"
-  eval $command >&7
+  eval "$command" >&7
 }
 
 on_exit() {
