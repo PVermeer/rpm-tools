@@ -40,12 +40,18 @@ get_git_submodule_paths() {
 }
 
 add_submodule() {
-  local repo
-  repo=$1
+  local repo=$1
+  local source_name=$2
+  local branch=$3
 
   echo -en "Adding new submodule: "
   echo_color -e "$repo"
-  git submodule add "$repo"
+
+  if [ -z "$branch" ]; then
+    git submodule add "$repo"
+  else
+    git submodule add --name "$source_name" --branch "$branch" "$repo" "$source_name"
+  fi
 }
 
 update_submodules() {
@@ -67,38 +73,37 @@ update_submodules() {
     repo=$value
     echo ""
 
-    # Add repo if not in .gitmodules
-    if [ ! -f ./.gitmodules ]; then
-      add_submodule "$repo"
-    fi
-
     local submodule_path
     local repo_match_number
     local commit
     local branch
 
-    submodule_path=$(get_submodule_path_from_url "$repo" || echo "")
+    repo_match_number=$(get_match_number "$key")
+    commit=$(find_matching_commit "$global_spec_vars" "$repo_match_number")
+    branch=$(find_matching_branch "$global_spec_vars" "$repo_match_number")
+    source=$(find_matching_source "$global_spec_vars" "$repo_match_number")
 
-    if [ -z "$submodule_path" ] || [ ! -d "$submodule_path" ]; then
-      add_submodule "$repo"
-      submodule_path=$(get_submodule_path_from_url "$repo" || echo "")
+    # Add repo if not in .gitmodules
+    if [ ! -f ./.gitmodules ]; then
+      add_submodule "$repo" "$source" "$branch"
+    fi
+
+    submodule_path="./${source}"
+    if [ ! -d "$submodule_path" ]; then
+      add_submodule "$repo" "$source" "$branch"
     fi
 
     if [ -z "$submodule_path" ]; then
       fail "Could not add submodule"
     fi
 
-    repo_match_number=$(get_match_number "$key")
-    commit=$(find_matching_commit "$global_spec_vars" "$repo_match_number")
-    branch=$(find_matching_branch "$global_spec_vars" "$repo_match_number")
-
     if [ -z "$commit" ]; then
       fail "Could not get commit for reset"
     fi
 
     echo -en "Resetting submodule: "
-    echo_color -e "$repo"
-    cd "./$submodule_path" || exit
+    echo_color -e "${repo} <${branch}>"
+    cd "$submodule_path" || exit
     if [ -n "$branch" ] && [ "$branch" != "HEAD" ]; then
       git switch "$branch"
     fi

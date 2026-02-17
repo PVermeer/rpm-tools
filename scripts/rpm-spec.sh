@@ -28,17 +28,45 @@ get_source_repo_urls_from_spec() {
   echo "${repo_urls[@]}"
 }
 
+get_source_names_from_spec() {
+  local spec_file=$1
+  local global_spec_vars
+  global_spec_vars=$(get_global_vars_from_spec "$spec_file")
+  local source_names=()
+
+  local keyValue
+  for keyValue in $global_spec_vars; do
+    local key
+    local value
+    local repo_match_number
+    local source
+
+    key=$(get_key "$keyValue")
+    value=$(get_value "$keyValue")
+
+    if [[ ! $key = sourcerepo* ]]; then continue; fi
+    repo_match_number=$(get_match_number "$key")
+    source=$(find_matching_source "$global_spec_vars" "$repo_match_number")
+
+    source_names+=("$source")
+  done
+
+  echo "${source_names[@]}"
+}
+
 get_source_repo_paths_from_spec() {
   local spec_file=$1
-  local source_repo_urls
-  source_repo_urls=$(get_source_repo_urls_from_spec "$spec_file")
+  local source_names
   local repo_paths=()
+  local global_spec_vars
 
-  local url
-  for url in ${source_repo_urls}; do
+  global_spec_vars=$(get_global_vars_from_spec "$spec_file")
+  source_names=$(get_source_names_from_spec "$spec_file")
+
+  local name
+  for name in ${source_names}; do
     local repo_path
-    repo_path=$(get_submodule_path_from_url "$url")
-    if [ -z "$repo_path" ]; then continue; fi
+    repo_path="./${name}"
     repo_paths+=("$repo_path")
   done
 
@@ -173,6 +201,33 @@ find_matching_commit() {
   done
 
   echo "$commit"
+}
+
+find_matching_source() {
+  local global_spec_vars=$1
+  local repo_match_number=$2
+  local source
+
+  local keyValue
+  for keyValue in $global_spec_vars; do
+    local key
+    local value
+
+    key=$(get_key "$keyValue")
+    value=$(get_value "$keyValue")
+
+    if [[ $key = source* ]]; then
+      local source_match_number
+      source_match_number=$(get_match_number "$key")
+
+      if [ "$repo_match_number" = "$source_match_number" ]; then
+        source=$value
+        break
+      fi
+    fi
+  done
+
+  echo "$source"
 }
 
 get_new_commit() {

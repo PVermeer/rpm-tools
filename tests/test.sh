@@ -91,8 +91,8 @@ remove_submodules() {
     fi
   }
 
-  test_command remove "./copr_realtek-alc887-vd"
-  test_command remove "./rpm-tools"
+  test_command remove "./test_source"
+  test_command remove "./test_source2"
 }
 
 # Tests
@@ -177,7 +177,7 @@ release() {
   rm $test_cargo
   rm "./tests/Cargo.lock"
   git tag -d "v${test_version}" || return 1
-  # git reset --soft HEAD~1 || return 1
+  git reset --soft HEAD~1 || return 1
 
   if [ "$is_failed" = "true" ]; then
     return 1
