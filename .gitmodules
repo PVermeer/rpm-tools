@@ -1,6 +1,8 @@
-[submodule "copr_realtek-alc887-vd"]
-	path = copr_realtek-alc887-vd
-	url = https://github.com/pvermeer/copr_realtek-alc887-vd
-[submodule "rpm-tools"]
-	path = rpm-tools
-	url = https://github.com/pvermeer/rpm-tools
+[submodule "test_source"]
+	path = test_source
+	url = https://github.com/PVermeer/rpm-tools.git
+	branch = copr_test_source
+[submodule "test_source2"]
+	path = test_source2
+	url = https://github.com/PVermeer/rpm-tools.git
+	branch = copr_test_source2

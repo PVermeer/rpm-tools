@@ -4,17 +4,18 @@
 
 # Source repo 1
 %global author pvermeer
-%global source copr_realtek-alc887-vd
-%global sourcerepo https://github.com/pvermeer/copr_realtek-alc887-vd
-%global commit dbd6a2dc2f54b9bf89c86e34d750fbb75879865c
+%global source test_source
+%global sourcerepo https://github.com/pvermeer/rpm-tools
+%global branch copr_test_source
+%global commit 9bd86bfa1391c47e878d05049b2db927aeaf10d3
 %global versioncommit %(echo -n %{commit} | head -c 8)
 
 # Source repo 2
 %global author2 pvermeer
-%global source2 rpm-tools_copr_test_source
+%global source2 test_source2
 %global sourcerepo2 https://github.com/pvermeer/rpm-tools
-%global branch2 copr_test_source
-%global commit2 d830deccb31b8b06bd6d0679cfdc588f8c4f1714
+%global branch2 copr_test_source2
+%global commit2 4c729811648c20423062af4160a2490557a16519
 %global versioncommit2 %(echo -n %{commit2} | head -c 8)
 
 # Own copr repo
@@ -23,7 +24,7 @@
 
 Name: rpm-tool
 Version: 0.0.2
-Release: 3.%{versioncommit}.%{versioncommit2}%{?dist}
+Release: 4.%{versioncommit}.%{versioncommit2}%{?dist}
 License: GPL-3.0 license
 Summary: RPM build to test the rpm-tools.
 Url: %{coprrepo}
