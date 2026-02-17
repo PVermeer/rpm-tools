@@ -50,7 +50,8 @@ test_command() {
   fi
 
   if [ "$verbose" = "true" ] || [ "$explicit_verbose" = "true" ]; then
-    run_debug "$command"
+    # shellcheck disable=SC2086
+    run_debug $command
   else
     $command &>/dev/null
   fi
