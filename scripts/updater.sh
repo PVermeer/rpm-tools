@@ -29,7 +29,7 @@ update_self() {
 
     current_commit=$(git submodule status | grep "$rpm_tools_submodule" | awk '{ print $1 }')
     # Remove leading '+' if submodule update is not commited yet
-    current_commit=$($current_commit | sed "s/\+/""/")
+    current_commit=${current_commit/#+/""}
     latest_commit=$(git ls-remote "$git_repo" "HEAD" | awk 'NR==1{ print $1 }')
 
     if [ "$current_commit" != "$latest_commit" ]; then
