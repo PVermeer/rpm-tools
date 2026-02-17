@@ -126,12 +126,10 @@ apply_patches() {
   local failed="false"
   local path
   for path in $submodule_paths; do
-    local patch_files="../patches/$path/*.patch"
-
     cd "./$path" || fail "Failed to cd into $path"
 
     # One-by-one so the filename of the patch is printed
-    if ls "$patch_files" &>/dev/null; then
+    if ls ../patches/"$path"/*.patch &>/dev/null; then
       local file
       for file in ../patches/"$path"/*.patch; do
         echo -n -e "\nPatch "
