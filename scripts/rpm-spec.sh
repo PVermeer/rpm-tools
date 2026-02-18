@@ -58,9 +58,7 @@ get_source_repo_paths_from_spec() {
   local spec_file=$1
   local source_names
   local repo_paths=()
-  local global_spec_vars
 
-  global_spec_vars=$(get_global_vars_from_spec "$spec_file")
   source_names=$(get_source_names_from_spec "$spec_file")
 
   local name

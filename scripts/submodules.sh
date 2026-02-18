@@ -48,7 +48,7 @@ add_submodule() {
   echo_color -e "$repo"
 
   if [ -z "$branch" ]; then
-    git submodule add "$repo"
+    git submodule add --name "$source_name" "$repo" "$source_name"
   else
     git submodule add --name "$source_name" --branch "$branch" "$repo" "$source_name"
   fi
