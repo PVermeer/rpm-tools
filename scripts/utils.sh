@@ -30,6 +30,11 @@ export_variables_to_tmp() {
 }
 
 check_dependencies() {
+  if [ -z "$release" ]; then
+    echo_error "release = undefined"
+    return 1
+  fi
+
   local missing_deps=()
   if [ ! -f "/usr/bin/which" ]; then missing_deps+=("which"); fi
   if ! which getopt &>/dev/null; then missing_deps+=("util-linux"); fi
@@ -40,9 +45,38 @@ check_dependencies() {
   if [ ${#missing_deps[@]} -gt 0 ]; then
     echo -n "Missing packages: "
     echo_color "${missing_deps[@]}"
-  else
-    echo "No missing packages"
+    return 1
   fi
+
+  if [ "$release" = "true" ]; then
+    if ! which git-cliff &>/dev/null; then
+      echo_warning "Missing git-cliff"
+
+      local cwd="$PWD"
+      local git_cliff_version="2.12.0"
+      local tmp_dir="${XDG_RUNTIME_DIR}/rpm-tools"
+      local user_bin_dir="${HOME}/.local/bin"
+
+      mkdir -p "$tmp_dir"
+      cd "$tmp_dir" || return 1
+
+      echo -e "Downloading git-cliff"
+      wget --quiet "https://github.com/orhun/git-cliff/releases/download/v${git_cliff_version}/git-cliff-${git_cliff_version}-x86_64-unknown-linux-gnu.tar.gz"
+
+      echo "Installing git-cliff"
+      tar -xvzf git-cliff-*.tar.gz &>/dev/null
+      cd "git-cliff-${git_cliff_version}" || return 1
+
+      mkdir -p "$user_bin_dir"
+      cp ./git-cliff "$user_bin_dir"
+      cd "$cwd" || return 1
+
+      echo_success "Installed git-cliff"
+      echo ""
+    fi
+  fi
+
+  echo_success "All packages installed"
 }
 
 git_check_for_changes() {

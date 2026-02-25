@@ -146,9 +146,12 @@ release() {
   local is_failed="false"
   local test_cargo_dep="static_assertions"
 
+  # Prep
   cp ./rpm-tool-tag.spec $test_spec
   cp ./Cargo.toml $test_cargo
+  rm "${HOME}/.local/bin/git-cliff"
 
+  # Test
   test_command ./rpm-tool release --spec-file="$test_spec" --cargo-file="$test_cargo" --no-push --new-version="$test_version" || return 1
 
   test_spec_version=$(grep "Version: " $test_spec)
