@@ -70,7 +70,7 @@ cd %{sourcedir2}
 git reset --hard %{commit2}
 
 # Do src stuff
-git apply %{coprdir}/patches/rpm-tools/src-to-be-patched.patch
+git apply %{coprdir}/patches/%{source2}/src-to-be-patched.patch
 
 # Quick test
 grep "This is patched!" src/src-to-be-patched.sh || (echo "Patching failed" >&2 && false);

@@ -188,6 +188,7 @@ release() {
 }
 
 # Run tests
+
 update_self
 echo ""
 
