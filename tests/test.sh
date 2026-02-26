@@ -137,6 +137,7 @@ update_self() {
 
 release() {
   echo_color "Create a release in git and update the RPM + Cargo"
+  local bump_version="$1"
   local test_spec_version
   local test_spec_tag
 
@@ -146,13 +147,22 @@ release() {
   local is_failed="false"
   local test_cargo_dep="static_assertions"
 
+  if [ "$bump_version" = "true" ]; then
+    bumped_version=$(git-cliff --bumped-version) # v1.2.3 format
+    test_version=${bumped_version#v}
+  fi
+
   # Prep
   cp ./rpm-tool-tag.spec $test_spec
   cp ./Cargo.toml $test_cargo
   rm "${HOME}/.local/bin/git-cliff"
 
   # Test
-  test_command ./rpm-tool release --spec-file="$test_spec" --cargo-file="$test_cargo" --no-push --new-version="$test_version" || return 1
+  if [ "$bump_version" = "false" ]; then
+    test_command ./rpm-tool release --spec-file="$test_spec" --cargo-file="$test_cargo" --no-push --new-version="$test_version" || return 1
+  else
+    test_command ./rpm-tool release --spec-file="$test_spec" --cargo-file="$test_cargo" --no-push --bump-version || return 1
+  fi
 
   test_spec_version=$(grep "Version: " $test_spec)
   test_spec_tag=$(grep "%global tag v" $test_spec)
@@ -179,8 +189,10 @@ release() {
   rm $test_spec
   rm $test_cargo
   rm "./tests/Cargo.lock"
+  rm "./CHANGELOG.md"
   git tag -d "v${test_version}" || return 1
   git reset --soft HEAD~1 || return 1
+  git reset || return 1 # Unstage
 
   if [ "$is_failed" = "true" ]; then
     return 1
@@ -192,7 +204,10 @@ release() {
 update_self
 echo ""
 
-release
+release "false"
+echo ""
+
+release "true"
 echo ""
 
 remove_submodules

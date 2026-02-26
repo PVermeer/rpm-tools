@@ -20,6 +20,7 @@ export update_submodules="false"
 export apply_patches="false"
 export check_patches="false"
 export without_local="false"
+export bump_version="false"
 export new_version=""
 export no_push="false"
 export cargo_file=""
@@ -54,7 +55,8 @@ usage() {
 
       [ release ] Create a release in git and update the RPM- and (optional) Cargo version
         Use this for owned repos
-        [ --new-version VERSION ] New semantic version (e.g. 1.2.3)
+        [ --bump-version ] Bump version based of semantic commits
+        [ --new-version VERSION ] Set the new semantic version (e.g. 1.2.3)
         [ --no-push ] Disable push to remote
         [ --cargo-file ] Specify path of Cargo.toml (default is repo root)
 
@@ -152,7 +154,7 @@ set_environment() {
 }
 
 set_arguments() {
-  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,check-patches,without-local,new-version:,no-push,cargo-file:,install-deps,update-self,build,update,release,update-submodules,copr-build,copr-status"
+  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,check-patches,without-local,bump-version,new-version:,no-push,cargo-file:,install-deps,update-self,build,update,release,update-submodules,copr-build,copr-status"
   local short_arguments=""
 
   local parsed_arguments
@@ -207,6 +209,10 @@ set_arguments() {
       ;;
     --without-local)
       without_local="true"
+      shift
+      ;;
+    --bump-version)
+      bump_version="true"
       shift
       ;;
     --new-version)

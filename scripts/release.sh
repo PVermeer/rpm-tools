@@ -8,6 +8,10 @@ if [ -z "$no_push" ]; then
   echo_error "no_push = undefined"
   exit 1
 fi
+if [ -z "$bump_version" ]; then
+  echo_error "bump_version = undefined"
+  exit 1
+fi
 if [ -z "$RPM_SPEC_UPDATE" ]; then
   echo_error "RPM_SPEC_UPDATE = undefined"
   exit 1
@@ -144,6 +148,7 @@ create_release_in_git() {
 
   git --no-pager diff --compact-summary --color=always
   echo ""
+  git add --all
   git commit -am "chore(release): ${new_version}" || true
   git tag -a "${new_tag}" -m "Release version ${new_version}"
   if [ "$no_push" = "false" ]; then
@@ -160,15 +165,27 @@ release() {
 
   if [ -n "$new_version" ]; then
     new_release_version=$new_version
+  elif [ "$bump_version" = "true" ]; then
+    local bumped_version
+    bumped_version=$(git-cliff --bumped-version) # v1.2.3 format
+    new_release_version=${bumped_version#v}
   else
     echo "Enter new version (e.g. 1.2.3):"
     read -r new_release_version
   fi
 
   echo "New version: ${new_release_version}"
-  validate_new_version "$current_version" "$new_release_version"
+  if ! validate_new_version "$current_version" "$new_release_version"; then
+    if [ "$bump_version" = "true" ]; then
+      echo_warning "If ${new_release_version} <= ${current_version}: Please create a the tag 'v${current_version}' in git"
+    fi
+    return 1
+  fi
 
   echo_color -e "\nApplying new version: $new_release_version"
+
+  echo_color -e "Generating CHANGELOG.md"
+  git-cliff -o --bump
 
   echo_color -e "Updating spec file"
   update_version_in_spec_file "$spec_file" "$new_release_version"
