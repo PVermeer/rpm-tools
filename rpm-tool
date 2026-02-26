@@ -3,6 +3,7 @@
 set -e
 set -o pipefail
 
+export script_dir
 script_dir=$(dirname "$0")
 
 source "${script_dir}/scripts/bash-color.sh"

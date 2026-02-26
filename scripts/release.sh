@@ -1,5 +1,9 @@
 #! /bin/bash
 
+if [ -z "$script_dir" ]; then
+  echo_error "script_dir = undefined"
+  exit 1
+fi
 if [ -z "$spec_file" ]; then
   echo_error "spec_file = undefined"
   exit 1
@@ -167,7 +171,7 @@ release() {
     new_release_version=$new_version
   elif [ "$bump_version" = "true" ]; then
     local bumped_version
-    bumped_version=$(git-cliff --bumped-version) # v1.2.3 format
+    bumped_version=$(git-cliff --config="${script_dir}/cliff.toml" --bumped-version) # v1.2.3 format
     new_release_version=${bumped_version#v}
   else
     echo "Enter new version (e.g. 1.2.3):"
@@ -185,7 +189,7 @@ release() {
   echo_color -e "\nApplying new version: $new_release_version"
 
   echo_color -e "Generating CHANGELOG.md"
-  git-cliff -o --bump
+  git-cliff --config="${script_dir}/cliff.toml" -o --bump
 
   echo_color -e "Updating spec file"
   update_version_in_spec_file "$spec_file" "$new_release_version"
