@@ -1,6 +1,7 @@
 [package]
 name = "some-app"
 version = "0.0.0"
+edition = "2024"
 
 # Prevents use of parent Cargo.toml when run from tests
 [workspace]

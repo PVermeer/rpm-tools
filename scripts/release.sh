@@ -133,11 +133,21 @@ update_version_in_cargo() {
     return 1
   }
 
+  # First, fetch all deps, cargo will refuse to update lockfile otherwise
+  # This must be online but version locked
+  cargo fetch --manifest-path "$cargo_file" --locked || {
+    echo_error "Failed to fetch crates from ${cargo_file}"
+    return 1
+  }
+
+  # Then update version
   sed -i "0,/${current_version_line}/s/${current_version_line}/${CARGO_VERSION_KEY} = \"${new_version}\"/" "$cargo_file" || {
     echo_error "Failed to update version in ${cargo_file}"
     return 1
   }
 
+  # Last, update lockfile with updated app version
+  # This must be offline so it only updates the app version
   cargo generate-lockfile --manifest-path "$cargo_file" --offline || {
     echo_error "Failed to generate a new lockfile from ${cargo_file}"
     return 1

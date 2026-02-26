@@ -143,6 +143,7 @@ release() {
 
   local test_spec="./tests/rpm-tool-tag-test.spec"
   local test_cargo="./tests/Cargo.toml"
+  local test_cargo_lock="./tests/Cargo.lock"
   local test_version="1.2.3"
   local is_failed="false"
   local test_cargo_dep="static_assertions"
@@ -155,6 +156,7 @@ release() {
   # Prep
   cp ./rpm-tool-tag.spec $test_spec
   cp ./Cargo.toml $test_cargo
+  cp ./Cargo.lock $test_cargo_lock
   rm "${HOME}/.local/bin/git-cliff"
 
   # Test
@@ -188,7 +190,7 @@ release() {
   # Cleanup
   rm $test_spec
   rm $test_cargo
-  rm "./tests/Cargo.lock"
+  rm $test_cargo_lock
   rm "./CHANGELOG.md"
   git tag -d "v${test_version}" || return 1
   git reset --soft HEAD~1 || return 1
