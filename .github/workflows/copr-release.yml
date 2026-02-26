@@ -1,0 +1,78 @@
+name: COPR release
+
+on:
+  workflow_call:
+    inputs:
+      spec_file:
+        description: Spec-file path
+        required: true
+        type: string
+
+      copr_owner:
+        description: COPR owner
+        required: true
+        type: string
+
+      copr_project:
+        description: COPR project
+        required: true
+        type: string
+
+      copr_package:
+        description: COPR package name
+        required: true
+        type: string
+
+    secrets:
+      COPR_WEBHOOK:
+        description: COPR webhook (SECRET)
+        required: true
+
+jobs:
+  release_copr:
+    runs-on: ubuntu-latest
+    name: Release rpm on COPR
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      SPEC_FILE: ${{ inputs.spec_file }}
+      COPR_OWNER: ${{ inputs.copr_owner }}
+      COPR_PROJECT: ${{ inputs.copr_project }}
+      COPR_PACKAGE: ${{ inputs.copr_package }}
+      COPR_WEBHOOK: ${{ secrets.COPR_WEBHOOK }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RPM_SPEC_UPDATE: "false"
+      COPR_STATUS: "null"
+
+    steps:
+      - name: Checkout rpm-tools
+        uses: actions/checkout@v4
+        with:
+          repository: pvermeer/rpm-tools
+          path: rpm-tools
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+          path: repo
+
+      - name: Create release in git
+        run: |
+          cd repo
+          git config --local user.email "action@github.com"
+          git config --local user.name "CI"
+          git --no-pager diff --color=always
+          echo ""
+
+          ../rpm-tools/rpm-tool release --bump-version --disable-self-update
+          
+          source $XDG_RUNTIME_DIR/rpm-tool-vars
+          echo "RPM_SPEC_UPDATE=$RPM_SPEC_UPDATE" >> $GITHUB_ENV
+
+      - name: Build on COPR
+        run: |
+          cd repo
+          ../rpm-tools/rpm-tool copr-build --disable-self-update
