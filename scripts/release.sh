@@ -162,7 +162,6 @@ create_release_in_git() {
 
   git --no-pager diff --compact-summary --color=always
   echo ""
-  git add --all
   git commit -am "chore(release): ${new_version}" || true
   git tag -a "${new_tag}" -m "Release version ${new_version}"
   if [ "$no_push" = "false" ]; then
