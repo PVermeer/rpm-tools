@@ -60,7 +60,7 @@ usage() {
         [ --no-push ] Disable push to remote
         [ --cargo-file ] Specify path of Cargo.toml (default is repo root)
 
-        Requires the spec file to have the following %gloval vars:
+        Requires the spec file to have the following %global vars:
           [ %global tag v<semantic version> ]
 
       [ update-submodules ] Update / Add submodules referenced in the spec file
