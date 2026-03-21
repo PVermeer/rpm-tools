@@ -69,7 +69,7 @@ build_rpm() {
     # For debugging COPR in local builds
     run_debug rpmbuild --define "_topdir $PWD/rpmbuild" -ba --noclean "./${spec_file}"
   else
-    run_debug rpmbuild --define "_topdir $PWD/rpmbuild" -ba --noclean --with local "./${spec_file}"
+    run_debug rpmbuild --define "_topdir $PWD/rpmbuild" --define "with_local 1" -ba --noclean "./${spec_file}"
   fi
 
   RPM_LOCAL_BUILD="true"

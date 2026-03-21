@@ -1,6 +1,6 @@
 # Create an option to build locally without fetchting own repo
 # for sourcing and patching
-%bcond local 0
+%{!?with_local:%global with_local 0}
 
 # Source repo 1
 %global author pvermeer
@@ -26,7 +26,7 @@ RPM build to test the rpm-tools
 %prep
 # To apply working changes handle sources / patches locally
 # COPR should clone the commited changes
-%if %{with local}
+%if 0%{?with_local}
   # Get sources - local build
   mkdir -p %{sourcedir}
   cp -r %{_topdir}/SOURCES/* %{sourcedir}
