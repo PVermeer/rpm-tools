@@ -28,6 +28,11 @@ on:
         required: false
         type: string
 
+      check_for_forked:
+        description: Check if a build is forked in a new chroot
+        required: false
+        type: boolean
+
     secrets:
       COPR_WEBHOOK:
         description: COPR webhook (SECRET)
@@ -78,9 +83,11 @@ jobs:
           ${{ inputs.check_patched_files_script }}
 
       - name: Check COPR status
+        env:
+          CHECK_FORKED: ${{ inputs.check_for_forked == 'true' && '--check-forked' || '' }}
         run: |
           cd repo
-          ../rpm-tools/rpm-tool copr-status --disable-self-update || true
+          ../rpm-tools/rpm-tool copr-status --disable-self-update $CHECK_FORKED || true
           source $XDG_RUNTIME_DIR/rpm-tool-vars
           echo "COPR_STATUS=$COPR_STATUS" >> $GITHUB_ENV
 
@@ -96,7 +103,7 @@ jobs:
           git push
 
       - name: Build on COPR
-        if: ${{ env.RPM_SPEC_UPDATE == 'true' || env.COPR_STATUS == 'failed' }}
+        if: ${{ env.RPM_SPEC_UPDATE == 'true' || env.COPR_STATUS == 'failed' || env.COPR_STATUS == 'forked' }}
         run: |
           cd repo
           ../rpm-tools/rpm-tool copr-build --disable-self-update

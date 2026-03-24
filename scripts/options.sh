@@ -17,6 +17,7 @@ export copr_owner=""
 export copr_project=""
 export copr_package=""
 export update_submodules="false"
+export check_forked="false"
 export apply_patches="false"
 export check_patches="false"
 export without_local="false"
@@ -46,6 +47,7 @@ usage() {
         [ --copr-owner NAME ] COPR owner
         [ --copr-project PROJECT ] COPR project
         [ --copr-package PACKAGE NAME ] COPR package name
+        [ --check-forked ] Check for forked status on chroots
 
       [ update ] Update the external repo commits in the RPM spec file to latest commit(s)
         Use this for external repo builds
@@ -154,7 +156,7 @@ set_environment() {
 }
 
 set_arguments() {
-  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,apply-patches,check-patches,without-local,bump-version,new-version:,no-push,cargo-file:,install-deps,update-self,build,update,release,update-submodules,copr-build,copr-status"
+  local long_arguments="help,disable-self-update,spec-file:,copr-webhook:,copr-owner:,copr-project:,copr-package:,copr-watch,update-submodules,check-forked,apply-patches,check-patches,without-local,bump-version,new-version:,no-push,cargo-file:,install-deps,update-self,build,update,release,update-submodules,copr-build,copr-status"
   local short_arguments=""
 
   local parsed_arguments
@@ -197,6 +199,10 @@ set_arguments() {
       ;;
     --update-submodules)
       update_submodules="true"
+      shift
+      ;;
+    --check-forked)
+      check_forked="true"
       shift
       ;;
     --apply-patches)

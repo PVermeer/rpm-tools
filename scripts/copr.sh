@@ -25,7 +25,7 @@ build_on_copr() {
 get_copr_response() {
   local response
   response=$(curl -s -X 'GET' \
-    "https://copr.fedorainfracloud.org/api_3/package/?ownername=$copr_owner&projectname=$copr_project&packagename=$copr_package&with_latest_build=true&with_latest_succeeded_build=false" \
+    "https://copr.fedorainfracloud.org/api_3/package/?ownername=$copr_owner&projectname=$copr_project&packagename=$copr_package&with_latest_build=true&with_latest_succeeded_build=true" \
     -H 'accept: application/json') || return 1
 
   echo "$response"
@@ -53,6 +53,35 @@ get_copr_status() {
   return 1
 }
 
+get_copr_latest_is_forked() {
+  if [ -z "$copr_owner" ] || [ -z "$copr_project" ] || [ -z "$copr_package" ]; then
+    fail_arg "Please provide all COPR information"
+  fi
+
+  local response
+  local build_state
+  local error
+
+  response=$(get_copr_response) || fail "Could not fetch copr project"
+  build_id="$(echo "$response" | jq -r -e '.builds.latest_succeeded.id')" || fail "Could not parse 'build id' on copr project"
+  error="$(echo "$response" | jq -r '.error')"
+
+  build_response=$(curl -s -X 'GET' \
+    "https://copr.fedorainfracloud.org/api_3/build/built-packages/$build_id" \
+    -H 'accept: application/json') || fail "Could not fetch build by id"
+  # Check if every chroot has build packages
+  is_forked=$(echo "$build_response" | jq -r -e 'keys[] as $key | select(.[$key].packages | length == 0) | $key' >/dev/null && echo "true" || echo "false")
+  error="$(echo "$build_response" | jq -r '.error')"
+
+  if [ "$error" = "null" ]; then
+    echo "$is_forked"
+    return 0
+  fi
+
+  echo "$error"
+  return 1
+}
+
 get_copr_version() {
   if [ -z "$copr_owner" ] || [ -z "$copr_project" ] || [ -z "$copr_package" ]; then
     fail_arg "Please provide all COPR information"
@@ -61,7 +90,7 @@ get_copr_version() {
   local response
   local build_version
   local error
-  
+
   response=$(get_copr_response) || fail "Could not fetch copr project"
   build_version="$(echo "$response" | jq -r -e '.builds.latest.source_package.version')" || fail "Could not parse 'copr version' on copr project"
   error="$(echo "$response" | jq -r '.error')"

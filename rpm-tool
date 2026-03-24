@@ -137,10 +137,18 @@ if [ $copr_status = "true" ]; then
     exit 1
   }
   build_state=$(get_copr_status) || on_error
+
+  if [ "$check_forked" = "true" ]; then
+    is_forked=$(get_copr_latest_is_forked) || on_error
+    if [ "$is_forked" = "true" ]; then
+      build_state="forked"
+    fi
+  fi
+
   COPR_STATUS="$build_state"
 
   echo -n "Copr build status: "
-  if [ "$build_state" = "failed" ]; then
+  if [ "$build_state" = "failed" ] || [ "$build_state" = "forked" ]; then
     echo_error "$build_state"
     exit 1
   else

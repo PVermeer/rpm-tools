@@ -13,6 +13,7 @@ jobs:
       copr_owner: pvermeer
       copr_project: rpm-tools-test
       copr_package: rpm-tool
+      check_for_forked: false
     permissions:
       contents: write
     secrets:
