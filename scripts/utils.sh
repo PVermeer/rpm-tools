@@ -41,6 +41,7 @@ check_dependencies() {
   if ! which git &>/dev/null; then missing_deps+=("git"); fi
   if ! which jq &>/dev/null; then missing_deps+=("jq"); fi
   if ! which rpmbuild &>/dev/null; then missing_deps+=("rpmbuild"); fi
+  if ! which rpmlint &>/dev/null; then missing_deps+=("rpmlint"); fi
 
   if [ ${#missing_deps[@]} -gt 0 ]; then
     echo -n "Missing packages: "
