@@ -7,9 +7,10 @@
 %global source rpm-tools
 %global sourcerepo https://github.com/pvermeer/rpm-tools
 %global tag v0.0.2
+%global version %(tag="%{tag}"; echo ${tag#v})
 
 Name: rpm-tool
-Version: 0.0.2
+Version: %{version}
 Release: 0%{?dist}
 License: GPL-3.0 license
 Summary: RPM build to test the rpm-tools.
