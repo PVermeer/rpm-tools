@@ -38,6 +38,7 @@ RPM build to test the rpm-tools
 cd %{sourcedir}
 git fetch --depth=1 origin tag %{tag}
 git reset --hard %{tag}
+git submodule update --init --depth 1 --recursive
 cd %{workdir}
 
 %build

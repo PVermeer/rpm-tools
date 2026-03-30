@@ -60,11 +60,13 @@ cd %{workdir}
 cd %{sourcedir}
 git fetch --depth=1 origin %{commit}
 git reset --hard %{commit}
+git submodule update --init --depth 1 --recursive
 cd %{workdir}
 
 cd %{sourcedir2}
 git fetch --depth=1 origin %{commit2}
 git reset --hard %{commit2}
+git submodule update --init --depth 1 --recursive
 cd %{workdir}
 
 # Do src stuff
