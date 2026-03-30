@@ -2,7 +2,7 @@
 # for sourcing and patching
 %{!?with_local:%global with_local 0}
 
-# Source repo 1
+# Source repo
 %global author pvermeer
 %global source test_source
 %global sourcerepo https://github.com/pvermeer/rpm-tools
@@ -36,11 +36,7 @@ RPM build to test the rpm-tools
   mkdir -p %{coprdir}
   cp -r %{_topdir}/SOURCES/. %{coprdir}
 %else
-  git clone %{coprrepo} --depth=1 --no-checkout %{coprdir}
-  cd %{coprdir}
-  git fetch --depth=1 origin
-  git reset --hard origin
-  cd %{_builddir}
+  git clone %{coprrepo} --depth=1 %{coprdir}
 %endif
 
 git clone %{sourcerepo} --depth=1 --no-checkout %{sourcedir}
