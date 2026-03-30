@@ -6,6 +6,6 @@ index 33da202..7d8ecd5 100644
  #!/bin/bash
  
 -echo "This is not patched"
-+echo "This is also patched!"
++echo "This is patched!"
  
  exit

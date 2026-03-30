@@ -52,6 +52,10 @@ git submodule update --init --depth 1 --recursive
 cd %{_builddir}
 
 # Do src stuff
+cd %{sourcedir}
+git apply %{coprdir}/patches/%{source}/src-to-be-patched.patch
+grep "This is patched!" src/src-to-be-patched.sh || (echo "Patching failed" >&2 && false);
+cd %{_builddir}
 
 %build
 

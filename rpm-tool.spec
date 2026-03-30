@@ -71,7 +71,7 @@ cd %{_builddir}
 # Do src stuff
 cd %{sourcedir2}
 git apply %{coprdir}/patches/%{source2}/src-to-be-patched.patch
-grep "This is patched!" src/src-to-be-patched.sh || (echo "Patching failed" >&2 && false);
+grep "This is also patched!" src/src-to-be-patched.sh || (echo "Patching failed" >&2 && false);
 cd %{_builddir}
 
 %build
