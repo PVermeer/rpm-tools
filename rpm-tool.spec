@@ -40,42 +40,37 @@ RPM build to test the rpm-tools
 %define sourcedir2 %{workdir}/%{source2}
 
 %prep
-# To apply working changes handle sources / patches locally
-# COPR should clone the commited changes
+# To apply working changes handle sources / patches with local changes.
+# COPR should clone the commited changes.
 %if 0%{?with_local}
-  # Get sources / patches - local build
   mkdir -p %{coprdir}
-  cp -r %{_topdir}/SOURCES/* %{coprdir}
+  cp -r %{_topdir}/SOURCES/. %{coprdir}
 %else
-  # Get sources / patches - COPR build
-  git clone %{coprrepo} %{coprdir}
-  cd %{coprdir}
-  rm -rf .git
-  cd %{workdir}
+  git clone %{coprrepo} --depth=1 --no-checkout %{coprdir}
 %endif
 
-# Get source1 repo
-git clone %{sourcerepo} %{sourcedir}
-cd %{sourcedir}
-git reset --hard %{commit}
+git clone %{sourcerepo} --depth=1 --no-checkout %{sourcedir}
+git clone %{sourcerepo2} --depth=1 --no-checkout %{sourcedir2}
 
-# Do src stuff
-
-rm -rf .git
+cd %{coprdir}
+git fetch --depth=1 origin
+git reset --hard origin
 cd %{workdir}
 
-# Get source2 repo
-git clone %{sourcerepo2} %{sourcedir2}
+cd %{sourcedir}
+git fetch --depth=1 origin %{commit}
+git reset --hard %{commit}
+cd %{workdir}
+
 cd %{sourcedir2}
+git fetch --depth=1 origin %{commit2}
 git reset --hard %{commit2}
+cd %{workdir}
 
 # Do src stuff
+cd %{sourcedir2}
 git apply %{coprdir}/patches/%{source2}/src-to-be-patched.patch
-
-# Quick test
 grep "This is patched!" src/src-to-be-patched.sh || (echo "Patching failed" >&2 && false);
-
-rm -rf .git
 cd %{workdir}
 
 %build

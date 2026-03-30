@@ -25,23 +25,19 @@ RPM build to test the rpm-tools
 %define sourcedir %{workdir}/%{source}
 
 %prep
-# To apply working changes handle sources / patches locally
-# COPR should clone the commited changes
+# To apply working changes handle sources / patches with local changes.
+# COPR should clone the commited changes.
 %if 0%{?with_local}
-  # Get sources - local build
   mkdir -p %{sourcedir}
-  cp -r %{_topdir}/SOURCES/* %{sourcedir}
+  cp -r %{_topdir}/SOURCES/. %{sourcedir}
 %else
-  # Get sources - COPR build
-  git clone %{sourcerepo} %{sourcedir}
-  cd %{sourcedir}
-  git reset --hard %{tag}
-  cd %{workdir}
+  git clone %{sourcerepo} --depth=1 --no-checkout %{sourcedir}
 %endif
 
 # Do src stuff
 cd %{sourcedir}
-rm -rf .git
+git fetch --depth=1 origin tag %{tag}
+git reset --hard %{tag}
 cd %{workdir}
 
 %build
