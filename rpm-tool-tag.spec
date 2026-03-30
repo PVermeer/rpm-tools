@@ -4,10 +4,14 @@
 
 # Source repo 1
 %global author pvermeer
-%global source rpm-tools
+%global source test_source
 %global sourcerepo https://github.com/pvermeer/rpm-tools
 %global tag v0.0.2
 %global version %(tag="%{tag}"; echo ${tag#v})
+
+# Own copr repo
+%global coprrepo https://github.com/pvermeer/rpm-tools
+%global coprsource rpm-tools
 
 Name: rpm-tool
 Version: %{version}
@@ -22,24 +26,32 @@ BuildRequires: git
 RPM build to test the rpm-tools
 
 %define workdir %{_builddir}/%{name}
+%define coprdir %{workdir}/%{coprsource}
 %define sourcedir %{workdir}/%{source}
 
 %prep
 # To apply working changes handle sources / patches with local changes.
 # COPR should clone the commited changes.
 %if 0%{?with_local}
-  mkdir -p %{sourcedir}
-  cp -r %{_topdir}/SOURCES/. %{sourcedir}
+  mkdir -p %{coprdir}
+  cp -r %{_topdir}/SOURCES/. %{coprdir}
 %else
-  git clone %{sourcerepo} --depth=1 --no-checkout %{sourcedir}
+  git clone %{coprrepo} --depth=1 --no-checkout %{coprdir}
+  cd %{coprdir}
+  git fetch --depth=1 origin
+  git reset --hard origin
+  cd %{workdir}
 %endif
 
-# Do src stuff
+git clone %{sourcerepo} --depth=1 --no-checkout %{sourcedir}
+
 cd %{sourcedir}
 git fetch --depth=1 origin tag %{tag}
 git reset --hard %{tag}
 git submodule update --init --depth 1 --recursive
 cd %{workdir}
+
+# Do src stuff
 
 %build
 
@@ -49,8 +61,8 @@ cd %{workdir}
 mkdir -p %{buildroot}/etc/modprobe.d
 mkdir -p %{buildroot}/lib/firmware
 
-install %{sourcedir}/sources/source1.source %{buildroot}/lib/firmware
-install %{sourcedir}/sources/source2.source %{buildroot}/etc/modprobe.d
+install %{coprdir}/sources/source1.source %{buildroot}/lib/firmware
+install %{coprdir}/sources/source2.source %{buildroot}/etc/modprobe.d
 
 %post
 echo "POST SCRIPT HERE"

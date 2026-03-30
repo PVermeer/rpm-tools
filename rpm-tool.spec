@@ -47,15 +47,14 @@ RPM build to test the rpm-tools
   cp -r %{_topdir}/SOURCES/. %{coprdir}
 %else
   git clone %{coprrepo} --depth=1 --no-checkout %{coprdir}
+  cd %{coprdir}
+  git fetch --depth=1 origin
+  git reset --hard origin
+  cd %{workdir}
 %endif
 
 git clone %{sourcerepo} --depth=1 --no-checkout %{sourcedir}
 git clone %{sourcerepo2} --depth=1 --no-checkout %{sourcedir2}
-
-cd %{coprdir}
-git fetch --depth=1 origin
-git reset --hard origin
-cd %{workdir}
 
 cd %{sourcedir}
 git fetch --depth=1 origin %{commit}
