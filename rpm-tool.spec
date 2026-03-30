@@ -34,10 +34,10 @@ BuildRequires: git
 %description
 RPM build to test the rpm-tools
 
-%define workdir %{_builddir}/%{name}
-%define coprdir %{workdir}/%{coprsource}
-%define sourcedir %{workdir}/%{source}
-%define sourcedir2 %{workdir}/%{source2}
+%define sourcesdir %{_builddir}/source
+%define coprdir %{sourcesdir}/%{coprsource}
+%define sourcedir %{sourcesdir}/%{source}
+%define sourcedir2 %{sourcesdir}/%{source2}
 
 %prep
 # To apply working changes handle sources / patches with local changes.
@@ -50,7 +50,7 @@ RPM build to test the rpm-tools
   cd %{coprdir}
   git fetch --depth=1 origin
   git reset --hard origin
-  cd %{workdir}
+  cd %{_builddir}
 %endif
 
 git clone %{sourcerepo} --depth=1 --no-checkout %{sourcedir}
@@ -60,19 +60,19 @@ cd %{sourcedir}
 git fetch --depth=1 origin %{commit}
 git reset --hard %{commit}
 git submodule update --init --depth 1 --recursive
-cd %{workdir}
+cd %{_builddir}
 
 cd %{sourcedir2}
 git fetch --depth=1 origin %{commit2}
 git reset --hard %{commit2}
 git submodule update --init --depth 1 --recursive
-cd %{workdir}
+cd %{_builddir}
 
 # Do src stuff
 cd %{sourcedir2}
 git apply %{coprdir}/patches/%{source2}/src-to-be-patched.patch
 grep "This is patched!" src/src-to-be-patched.sh || (echo "Patching failed" >&2 && false);
-cd %{workdir}
+cd %{_builddir}
 
 %build
 
