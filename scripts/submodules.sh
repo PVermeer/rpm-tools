@@ -102,7 +102,7 @@ update_submodules() {
     fi
 
     echo -en "Resetting submodule: "
-    echo_color -e "${repo} <${branch}>"
+    echo_color -e "${repo} <${branch}> <${commit}>"
     cd "$submodule_path" || exit
     if [ -n "$branch" ] && [ "$branch" != "HEAD" ]; then
       git switch "$branch"
