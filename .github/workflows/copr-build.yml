@@ -87,7 +87,7 @@ jobs:
 
       - name: Check COPR status
         env:
-          CHECK_FORKED: ${{ inputs.check_for_forked == 'true' && '--check-forked' || '' }}
+          CHECK_FORKED: ${{ inputs.check_for_forked && '--check-forked' || '' }}
         run: |
           cd repo
           ../rpm-tools/rpm-tool copr-status --disable-self-update $CHECK_FORKED || true
