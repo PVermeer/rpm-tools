@@ -240,6 +240,26 @@ get_new_commit() {
   echo "$new_commit"
 }
 
+set_copr_branch() {
+  local spec_file=$1
+  local current_copr_branch=$2
+  local new_copr_branch
+
+  new_copr_branch=$(git branch --show-current)
+
+  echo ""
+  echo_color -n "Copr branch:"
+  echo " $current_copr_branch -> $new_copr_branch"
+
+  if [ "$current_copr_branch" = "$new_copr_branch" ]; then
+    echo_success "No change detected"
+  else
+    echo_warning "Change detected"
+  fi
+
+  sed -i "s/%global\scoprbranch\s.*/%global coprbranch $new_copr_branch/" "./${spec_file}"
+}
+
 update_spec_repos() {
   local spec_file
   local global_spec_vars
@@ -256,6 +276,10 @@ update_spec_repos() {
 
     key=$(get_key "$keyValue")
     value=$(get_value "$keyValue")
+
+    if [[ $key = coprbranch ]]; then
+      set_copr_branch "$spec_file" "$value"
+    fi
 
     if [[ ! $key = sourcerepo* ]]; then continue; fi
 

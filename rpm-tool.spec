@@ -21,6 +21,7 @@
 # Own copr repo
 %global coprrepo https://github.com/pvermeer/rpm-tools
 %global coprsource rpm-tools
+%global coprbranch main
 
 Name: rpm-tool
 Version: 0.0.2
@@ -46,7 +47,7 @@ RPM build to test the rpm-tools
   mkdir -p %{coprdir}
   cp -r %{_topdir}/SOURCES/. %{coprdir}
 %else
-  git clone %{coprrepo} --depth=1 %{coprdir}
+  git clone --branch %{coprbranch} --depth=1 %{coprrepo} %{coprdir}
 %endif
 
 git clone %{sourcerepo} --depth=1 --no-checkout %{sourcedir}
