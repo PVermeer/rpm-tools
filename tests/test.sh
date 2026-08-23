@@ -201,7 +201,48 @@ release() {
   fi
 }
 
+update_rpm() {
+  echo_color "Update RPM spec"
+  local is_failed
+  local test_spec_copr_branch
+  local test_spec="./tests/rpm-tool.spec"
+  local test_branch="testing"
+
+  # Prep
+  cp ./rpm-tool.spec $test_spec
+
+  sed -i "s/%global\scoprbranch\s.*/%global coprbranch $test_branch/" "./${test_spec}"
+  test_spec_copr_branch=$(grep "%global coprbranch " $test_spec)
+  if ! echo "$test_spec_copr_branch" | grep $test_branch &>/dev/null; then
+    echo_error "Failed: Failed to update copr branch before test"
+    is_failed="true"
+  fi
+
+  # Test
+  test_command ./rpm-tool update --spec-file="$test_spec" || return 1
+
+  test_spec_copr_branch=$(grep "%global coprbranch " $test_spec)
+
+  echo "Copr branch in spec file: $test_spec_copr_branch"
+
+  # Checks
+  if echo "$test_spec_copr_branch" | grep $test_branch &>/dev/null; then
+    echo_error "Failed: Failed to update copr branch"
+    is_failed="true"
+  fi
+
+  # Cleanup
+  rm $test_spec
+
+  if [ "$is_failed" = "true" ]; then
+    return 1
+  fi
+}
+
 # Run tests
+
+update_rpm
+echo ""
 
 update_self
 echo ""
