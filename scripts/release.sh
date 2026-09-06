@@ -160,6 +160,7 @@ create_release_in_git() {
 
   new_tag="v${new_version}"
 
+  git add CHANGELOG.md
   git --no-pager diff --compact-summary --color=always
   echo ""
   git commit -am "chore(release): ${new_version}" || true
