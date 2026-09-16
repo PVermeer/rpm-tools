@@ -81,15 +81,21 @@ check_dependencies() {
 }
 
 git_check_for_changes() {
+  local git_status git_remote_status
+
   echo_color "Checking git"
 
-  git status --short --ignore-submodules | grep -E '^.*\.spec$' && fail "Spec file has been updated, but not commited to git"
+  git_status=$(git status --short --ignore-submodules)
+  if [ -n "$git_status" ]; then
+    echo "$git_status"
+    fail "There are active changes in the repo, please commit and push your changes before releasing."
+  fi
 
-  git status --short --ignore-submodules | grep -E '^.*patches/.*$' && fail "Patches have been updated, but not commited to git"
-
-  git status --short --ignore-submodules | grep -E '^.*sources/.*$' && fail "Sources have been updated, but not commited to git"
-
-  git fetch && git log HEAD --oneline --not --remotes | grep '.*' && fail "Some commits are not pushed to remote"
+  git_remote_status=$(git fetch && git log HEAD --oneline --not --remotes)
+  if [ -n "$git_remote_status" ]; then
+    echo "$git_remote_status"
+    fail "Some commits are not pushed to remote, please commit and push your changes before releasing."
+  fi
 
   echo "No changes detected"
 }
