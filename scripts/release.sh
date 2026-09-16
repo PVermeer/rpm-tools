@@ -174,6 +174,8 @@ release() {
   local current_version
   local new_release_version
 
+  git_check_for_changes
+
   current_version=$(get_current_version "$spec_file")
   echo "Current version: ${current_version}"
 
