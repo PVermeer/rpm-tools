@@ -126,7 +126,7 @@ echo_color() {
 echo_error() {
   local arguments=$@
   parse_arguments $arguments
-  echo -e $switches "${errorcolor}✕ $arguments${removecolor}"
+  echo -e $switches "${errorcolor}✕ $arguments${removecolor}" >&2
 }
 
 echo_warning() {
