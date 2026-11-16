@@ -3,7 +3,7 @@
 {
 	"build": {
 		// Path is relative to the devcontainer.json file.
-		"dockerfile": "./Dockerfile"
+		"dockerfile": "rpm.Dockerfile"
 	},
 	"features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {
@@ -14,6 +14,7 @@
 			"upgradePackages": "false"
 		}
 	},
+	"postCreateCommand": "rustup-init -y",
 	"postStartCommand": "sudo dnf update -y && (rustup update || (rustup toolchain uninstall stable && rustup toolchain install stable))",
 	"customizations": {
 		"vscode": {
